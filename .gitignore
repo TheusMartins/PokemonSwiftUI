@@ -70,3 +70,13 @@ fastlane/test_output
 Tuist/Dependencies/
 **/DerivedData/
 **/*.xcworkspace
+
+# macOS
+.DS_Store
+
+# Tuist / Xcode generated
+**/*.xcodeproj
+**/*.xcworkspace
+**/Derived
+.tuist-cache/
+Tuist/Dependencies/
