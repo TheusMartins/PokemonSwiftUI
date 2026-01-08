@@ -14,8 +14,8 @@ let project = Project(
             resources: ["Resources/**"],
             dependencies: [
                 .project(target: "CoreNetworking", path: "../../Modules/Core/CoreNetworking"),
-                .project(target: "CorePersistence", path: "../../Modules/Core/CorePersistence"),
-                .project(target: "CoreDesignSystem", path: "../../Modules/Core/CoreDesignSystem")
+                .project(target: "CoreDesignSystem", path: "../../Modules/Core/CoreDesignSystem"),
+                .project(target: "CoreRemoteImage", path: "../../Modules/Core/CoreRemoteImage")
             ]
         ),
         .target(

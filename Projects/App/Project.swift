@@ -11,7 +11,10 @@ let project = Project(
             infoPlist: .default,
             sources: ["Sources/**"],
             resources: ["Resources/**"],
-            dependencies: []
+            dependencies: [
+                .project(target: "PokedexListing", path: "../Features/PokedexListing"),
+                .project(target: "PokemonTeam", path: "../Features/PokemonTeam")
+            ]
         ),
         .target(
             name: "PokedexShowcaseTests",
