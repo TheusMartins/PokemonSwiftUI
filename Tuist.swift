@@ -1,3 +1,6 @@
 import ProjectDescription
 
-let tuist = Tuist()
+let config = Config(
+    compatibleXcodeVersions: .all,
+    cloud: nil
+)
