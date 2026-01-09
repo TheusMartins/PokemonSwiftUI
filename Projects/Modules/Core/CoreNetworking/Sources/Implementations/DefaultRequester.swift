@@ -46,27 +46,21 @@ public actor DefaultRequester: Requester {
 
     // MARK: - Helpers
 
+
     private func buildURLRequest(basedOn infos: RequestInfos) -> URLRequest? {
-        var components = URLComponents(
-            url: infos.baseURL.appendingPathComponent(infos.endpoint),
-            resolvingAgainstBaseURL: false
-        )
-
-        if let parameters = infos.parameters, !parameters.isEmpty {
-            components?.queryItems = parameters
-                .map { URLQueryItem(name: $0.key, value: $0.value) }
-                .sorted { $0.name < $1.name }
+        guard let baseURL = infos.baseURL,
+              var url = URLComponents(string: "\(baseURL)\(infos.endpoint)") else {
+            return nil
         }
 
-        guard let url = components?.url else { return nil }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = infos.method.rawValue
-
-        infos.headers?.forEach { key, value in
-            request.setValue(value, forHTTPHeaderField: key)
+        infos.parameters?.forEach { key, value in
+            url.queryItems = (url.queryItems ?? []) + [URLQueryItem(name: key, value: "\(value)")]
         }
 
-        return request
+        guard let finalURL = url.url else {
+            return nil
+        }
+
+        return URLRequest(url: finalURL)
     }
 }
