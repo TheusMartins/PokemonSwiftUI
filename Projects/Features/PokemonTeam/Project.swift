@@ -37,7 +37,9 @@ let project = Project(
             product: .app,
             bundleId: "com.matheusmartins.PokemonTeamDemoApp",
             deploymentTargets: .iOS("17.0"),
-            infoPlist: .default,
+            infoPlist: .extendingDefault(with: [
+                "UILaunchScreen": [:]
+            ]),
             sources: ["DemoApp/Sources/**"],
             resources: ["DemoApp/Resources/**"],
             dependencies: [

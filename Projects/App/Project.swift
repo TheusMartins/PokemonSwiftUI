@@ -8,7 +8,9 @@ let project = Project(
             destinations: .iOS,
             product: .app,
             bundleId: "com.matheusmartins.pokedexshowcase",
-            infoPlist: .default,
+            infoPlist: .extendingDefault(with: [
+                "UILaunchScreen": [:]
+            ]),
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
