@@ -1,5 +1,5 @@
 //
-//  RemoteImageState.swift
+//  RemoteImageRequest.swift
 //  CoreRemoteImage
 //
 //  Created by Matheus Martins on 09/01/26.
