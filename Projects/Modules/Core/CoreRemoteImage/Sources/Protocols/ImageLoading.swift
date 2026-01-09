@@ -9,5 +9,5 @@ import Foundation
 import SwiftUI
 
 public protocol ImageLoading: Sendable {
-    func loadImage(from url: URL) async throws -> Image
+    func loadImageData(from url: URL) async throws -> Data
 }

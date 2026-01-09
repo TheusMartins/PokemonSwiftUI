@@ -29,8 +29,8 @@ public final class RemoteImageModel: ObservableObject {
         task = Task { [weak self] in
             guard let self else { return }
             do {
-                let image = try await loader.loadImage(from: url)
-                self.state = .success(image)
+                let imageData = try await loader.loadImageData(from: url)
+                self.state = .success(imageData)
             } catch {
                 self.state = .failure
             }

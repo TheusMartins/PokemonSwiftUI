@@ -10,6 +10,6 @@ import SwiftUI
 public enum RemoteImageState: Equatable {
     case idle
     case loading
-    case success(Image)
+    case success(Data)
     case failure
 }

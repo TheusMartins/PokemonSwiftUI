@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftUI
 import UIKit
 import CoreNetworking
 
@@ -27,25 +26,27 @@ public actor RemoteImageLoader: ImageLoading {
         self.cache = cache
     }
 
-    public func loadImage(from url: URL) async throws -> Image {
+    public func loadImageData(from url: URL) async throws -> Data {
         let key = url.absoluteString
 
-        if let cached = await cache.image(forKey: key) {
+        if let cached = await cache.data(forKey: key) {
             return cached
         }
 
-        let response = try await requester.request(basedOn: RemoteImageRequest(url: url))
+        let response = try await requester.request(
+            basedOn: RemoteImageRequest(url: url)
+        )
 
-        if let http = response.response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+        if let http = response.response as? HTTPURLResponse,
+           !(200...299).contains(http.statusCode) {
             throw RemoteImageError.invalidStatusCode(http.statusCode)
         }
 
-        guard let uiImage = UIImage(data: response.data) else {
+        guard UIImage(data: response.data) != nil else {
             throw RemoteImageError.invalidImageData
         }
 
-        let image = Image(uiImage: uiImage)
-        await cache.insert(image, forKey: key)
-        return image
+        await cache.insert(response.data, forKey: key)
+        return response.data
     }
 }

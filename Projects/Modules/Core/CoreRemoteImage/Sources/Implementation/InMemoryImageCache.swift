@@ -5,30 +5,30 @@
 //  Created by Matheus Martins on 09/01/26.
 //
 
-import SwiftUI
+import Foundation
 
 public actor InMemoryImageCache: ImageCaching {
-    private let cache = NSCache<NSString, AnyObject>()
+    private let cache = NSCache<NSString, NSData>()
 
     public init() {}
 
-    public func image(forKey key: String) -> Image? {
-        cache.object(forKey: key as NSString) as? Image
+    public func data(forKey key: String) async -> Data? {
+        cache.object(forKey: key as NSString) as Data?
     }
 
-    public func insert(_ image: Image?, forKey key: String) {
-        guard let image else {
-            remove(forKey: key)
+    public func insert(_ data: Data?, forKey key: String) async {
+        guard let data else {
+            await remove(forKey: key)
             return
         }
-        cache.setObject(image as AnyObject, forKey: key as NSString)
+        cache.setObject(data as NSData, forKey: key as NSString)
     }
 
-    public func remove(forKey key: String) {
+    public func remove(forKey key: String) async {
         cache.removeObject(forKey: key as NSString)
     }
 
-    public func removeAll() {
+    public func removeAll() async {
         cache.removeAllObjects()
     }
 }
