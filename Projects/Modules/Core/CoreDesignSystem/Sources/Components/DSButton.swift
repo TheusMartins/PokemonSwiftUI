@@ -128,12 +128,12 @@ private struct DSButtonPreviewScreen: View {
     }
 }
 
-#Preview("DSButton - Light") {
-    DSButtonPreviewScreen()
-        .preferredColorScheme(.light)
-}
-
 #Preview("DSButton - Dark") {
     DSButtonPreviewScreen()
         .preferredColorScheme(.dark)
+}
+
+#Preview("DSButton - Light") {
+    DSButtonPreviewScreen()
+        .preferredColorScheme(.light)
 }

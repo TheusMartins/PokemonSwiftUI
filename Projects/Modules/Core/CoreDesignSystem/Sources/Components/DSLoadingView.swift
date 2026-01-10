@@ -58,3 +58,23 @@ private struct Spinner: View {
             .onAppear { isAnimating = true }
     }
 }
+
+#Preview("Light") {
+    ZStack {
+        DSColorToken.background.color
+            .ignoresSafeArea()
+
+        DSLoadingView()
+    }
+    .preferredColorScheme(.light)
+}
+
+#Preview("Dark") {
+    ZStack {
+        DSColorToken.background.color
+            .ignoresSafeArea()
+
+        DSLoadingView()
+    }
+    .preferredColorScheme(.dark)
+}
