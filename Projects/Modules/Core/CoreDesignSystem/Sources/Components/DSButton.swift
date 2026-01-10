@@ -50,18 +50,18 @@ public struct DSButton: View {
         .buttonStyle(.plain)
         .background(backgroundColor)
         .overlay(borderOverlay)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: DSRadius.md.value))
         .opacity(isEnabled ? 1 : 0.5)
         .disabled(!isEnabled || isLoading)
     }
 
     private var backgroundColor: some View {
-        RoundedRectangle(cornerRadius: 12)
+        RoundedRectangle(cornerRadius: DSRadius.md.value)
             .fill(style == .primary ? DSColorToken.brand.color : DSColorToken.surface.color)
     }
 
     private var borderOverlay: some View {
-        RoundedRectangle(cornerRadius: 12)
+        RoundedRectangle(cornerRadius: DSRadius.md.value)
             .stroke(DSColorToken.border.color, lineWidth: style == .secondary ? 1 : 0)
     }
 
