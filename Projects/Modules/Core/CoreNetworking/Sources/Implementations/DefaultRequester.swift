@@ -48,8 +48,15 @@ public actor DefaultRequester: Requester {
 
 
     private func buildURLRequest(basedOn infos: RequestInfos) -> URLRequest? {
-        guard let baseURL = infos.baseURL,
-              var url = URLComponents(string: "\(baseURL)\(infos.endpoint)") else {
+        let urlString: String
+
+        if let baseURL = infos.baseURL {
+            urlString = "\(baseURL)\(infos.endpoint)"
+        } else {
+            urlString = infos.endpoint
+        }
+
+        guard var url = URLComponents(string: urlString) else {
             return nil
         }
 

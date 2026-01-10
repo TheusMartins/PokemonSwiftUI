@@ -10,7 +10,7 @@ import Foundation
 
 protocol PokemonListRepository {
     func getGenerations() async throws -> PokemonGenerationModel
-    func getPokemon(generationId: Int) async throws -> PokemonListModel
+    func getPokemon(generationId: String) async throws -> PokemonListModel
 }
 
 final class PokemonListRepositoryImpl: PokemonListRepository {
@@ -25,7 +25,7 @@ final class PokemonListRepositoryImpl: PokemonListRepository {
         return try await parseGenerationResponse(response: response)
     }
     
-    func getPokemon(generationId: Int) async throws -> PokemonListModel {
+    func getPokemon(generationId: String) async throws -> PokemonListModel {
         let response = try await requester.request(basedOn: PokemonListRequests.getPokemons(generationId: generationId))
         return try await parsePokemonResponse(response: response)
     }

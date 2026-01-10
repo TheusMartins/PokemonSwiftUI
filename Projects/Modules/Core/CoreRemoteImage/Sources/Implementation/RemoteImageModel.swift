@@ -32,6 +32,10 @@ public final class RemoteImageModel: ObservableObject {
                 let imageData = try await loader.loadImageData(from: url)
                 self.state = .success(imageData)
             } catch {
+                if Task.isCancelled {
+                    return
+                }
+                
                 self.state = .failure
             }
         }

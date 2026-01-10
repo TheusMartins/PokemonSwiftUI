@@ -9,7 +9,7 @@ import CoreRemoteImage
 import CoreDesignSystem
 import SwiftUI
 
-struct PokemonListView: View {
+struct PokemonItemListView: View {
     var url: URL
     let pokemonName: String
     
@@ -17,16 +17,12 @@ struct PokemonListView: View {
         HStack(alignment: .center, spacing: DSSpacing.md.value) {
             RemoteImageView(
                 url: url,
-                placeholder: {
-                    EmptyView()
-                },
-                loading: {
-                    DSLoadingView(size: 60)
-                },
-                failure: {
-                    EmptyView()
-                }
+                placeholder: { Color.clear },
+                loading: { DSLoadingView(size: 22) },
+                failure: { Image(systemName: "photo").imageScale(.large) }
             )
+            .frame(width: 80, height: 80)
+            .clipped()
             
             DSText(pokemonName, style: .title)
         }

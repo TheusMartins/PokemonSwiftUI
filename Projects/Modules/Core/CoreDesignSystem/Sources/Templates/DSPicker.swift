@@ -39,13 +39,13 @@ public struct DSPicker<Option: Hashable & Sendable>: View {
             Button {
                 isPresented = true
             } label: {
-                HStack(spacing: DSSpacing.sm.value) {
+                HStack(alignment: .center, spacing: DSSpacing.sm.value) {
                     Image(systemName: "chevron.down")
                         .rotationEffect(.degrees(isPresented ? 180 : 0))
                         .animation(.easeInOut(duration: 0.18), value: isPresented)
                         .foregroundStyle(DSColorToken.textSecondary.color)
                     
-                    DSText(label(selection), style: .body, color: .textPrimary)
+                    DSText(label(selection), style: .title, color: .textPrimary)
 
                     
                     Spacer()
@@ -139,7 +139,6 @@ private struct DSPickerPreviewContent: View {
             DSText("DSPicker Showcase", style: .headline)
 
             DSPicker(
-//                title: "Generation",
                 options: Generation.allCases,
                 selection: $generation,
                 label: { @Sendable in $0.title }

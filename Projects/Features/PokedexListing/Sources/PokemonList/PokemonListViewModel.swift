@@ -7,48 +7,64 @@
 
 import Foundation
 
-final class PokemonListViewModel {
+@MainActor
+final class PokemonListViewModel: ObservableObject {
     private let repository: PokemonListRepository
-    private var selectedGeneration: Int = 1
+    @Published var selectedGeneration: GenerationModel?
     
-    @Published var state: PokemonListViewModel.State = .idle
+    @Published private(set) var generations: [GenerationModel] = []
+    @Published private(set) var pokemons: [PokemonModel] = []
+    @Published var state: State = .idle
     
     enum State {
         case idle
         case loading
-        case didLoad(generationModel: [GenerationModel], pokemonModel: [PokemonModel])
-        case didLoadNewGeneration(pokemonModel: [PokemonModel])
-        case didFailOnLoad(feedbackMessage: String)
+        case loaded
+        case failed(message: String)
     }
     
     init(repository: PokemonListRepository = PokemonListRepositoryImpl()) {
         self.repository = repository
     }
     
-    func getPokemons() async {
+    func loadIfNeeded() async {
+        guard case .idle = state else { return }
+        await load()
+    }
+
+    func load() async {
         state = .loading
         do {
-            let generation = try await repository.getGenerations()
-            let pokemonGeneration = try await repository.getPokemon(generationId: selectedGeneration)
-            
-            await MainActor.run {
-                self.state = .didLoad(generationModel: generation.results, pokemonModel: pokemonGeneration.results)
+            let generationsResponse = try await repository.getGenerations()
+            generations = generationsResponse.results
+            selectedGeneration = generations.first
+
+            if let generation = selectedGeneration {
+                let pokemonResponse = try await repository.getPokemon(
+                    generationId: generation.name
+                )
+                pokemons = pokemonResponse.results
             }
+
+            state = .loaded
         } catch {
-            state = .didFailOnLoad(feedbackMessage: "Something went wrong")
+            state = .failed(message: "Something went wrong")
         }
     }
     
-    func changeGeneration(id: Int) async {
-        state = .loading
-        selectedGeneration = id
+    func changeGeneration(to generation: GenerationModel) async {
+        selectedGeneration = generation
+
+        guard let id = selectedGeneration?.name else {
+            state = .failed(message: "Invalid generation id")
+            return
+        }
+
         do {
-            let pokemonGeneration = try await repository.getPokemon(generationId: selectedGeneration)
-            await MainActor.run {
-                self.state = .didLoadNewGeneration(pokemonModel: pokemonGeneration.results)
-            }
+            pokemons = try await repository.getPokemon(generationId: id).results
+            state = .loaded
         } catch {
-            state = .didFailOnLoad(feedbackMessage: "Something went wrong")
+            state = .failed(message: "Something went wrong")
         }
     }
 }

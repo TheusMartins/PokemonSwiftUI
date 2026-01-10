@@ -16,23 +16,24 @@ public struct RemoteImageView<Placeholder: View, Loading: View, Failure: View>: 
     private let failure: Failure
 
     @StateObject private var model: RemoteImageModel
+    private let loader: any ImageLoading
 
     public init(
         url: URL?,
+        loader: any ImageLoading = RemoteImageLoader(),
         contentMode: ContentMode = .fill,
         @ViewBuilder placeholder: () -> Placeholder,
         @ViewBuilder loading: () -> Loading,
         @ViewBuilder failure: () -> Failure
     ) {
         self.url = url
+        self.loader = loader
         self.contentMode = contentMode
         self.placeholder = placeholder()
         self.loading = loading()
         self.failure = failure()
 
-        _model = StateObject(
-            wrappedValue: RemoteImageModel()
-        )
+        _model = StateObject(wrappedValue: RemoteImageModel(loader: loader))
     }
 
     public var body: some View {

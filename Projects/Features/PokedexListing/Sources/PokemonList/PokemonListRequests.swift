@@ -10,7 +10,7 @@ import Foundation
 
 enum PokemonListRequests {
     case getGenerations
-    case getPokemons(generationId: Int)
+    case getPokemons(generationId: String)
 }
 
 extension PokemonListRequests: RequestInfos {

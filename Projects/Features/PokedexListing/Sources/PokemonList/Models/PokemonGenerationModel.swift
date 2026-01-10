@@ -11,7 +11,7 @@ struct PokemonGenerationModel: Codable {
     let results: [GenerationModel]
 }
 
-struct GenerationModel: Codable {
+struct GenerationModel: Codable, Hashable, Sendable {
     let name: String
     let url: URL
 }
