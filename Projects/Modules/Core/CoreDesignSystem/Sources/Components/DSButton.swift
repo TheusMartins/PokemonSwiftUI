@@ -57,7 +57,11 @@ public struct DSButton: View {
 
     private var backgroundColor: some View {
         RoundedRectangle(cornerRadius: DSRadius.md.value)
-            .fill(style == .primary ? DSColorToken.brand.color : DSColorToken.surface.color)
+            .fill(
+                style == .primary
+                ? DSColorToken.brandPrimary.color
+                : DSColorToken.brandSecondary.color
+            )
     }
 
     private var borderOverlay: some View {
@@ -66,6 +70,70 @@ public struct DSButton: View {
     }
 
     private var titleColorToken: DSColorToken {
-        style == .primary ? .brandOn : .textPrimary
+        style == .primary
+        ? .brandPrimaryOn
+        : .brandSecondaryOn
     }
+}
+
+private struct DSButtonPreviewScreen: View {
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: DSSpacing.lg.value) {
+
+                section("Primary") {
+                    buttonRow(
+                        DSButton(title: "Primary", style: .primary) {},
+                        DSButton(title: "Primary (Loading)", style: .primary, isLoading: true) {},
+                        DSButton(title: "Primary (Disabled)", style: .primary, isEnabled: false) {}
+                    )
+                }
+
+                section("Secondary") {
+                    buttonRow(
+                        DSButton(title: "Secondary", style: .secondary) {},
+                        DSButton(title: "Secondary (Loading)", style: .secondary, isLoading: true) {},
+                        DSButton(title: "Secondary (Disabled)", style: .secondary, isEnabled: false) {}
+                    )
+                }
+
+                section("Edge cases") {
+                    buttonRow(
+                        DSButton(title: "Long title — Lorem ipsum dolor sit amet", style: .primary) {},
+                        DSButton(title: "Long title — Lorem ipsum dolor sit amet", style: .secondary) {},
+                        DSButton(title: "Tap me", style: .primary) {}
+                    )
+                }
+            }
+            .padding(DSSpacing.lg.value)
+            .background(DSColorToken.background.color)
+        }
+    }
+
+    // MARK: - UI helpers
+
+    private func section(_ title: String, @ViewBuilder content: () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: DSSpacing.sm.value) {
+            DSText(title, style: .title, color: .textPrimary)
+            content()
+        }
+    }
+
+    private func buttonRow(_ first: DSButton, _ second: DSButton, _ third: DSButton) -> some View {
+        VStack(spacing: DSSpacing.sm.value) {
+            first
+            second
+            third
+        }
+    }
+}
+
+#Preview("DSButton - Light") {
+    DSButtonPreviewScreen()
+        .preferredColorScheme(.light)
+}
+
+#Preview("DSButton - Dark") {
+    DSButtonPreviewScreen()
+        .preferredColorScheme(.dark)
 }
