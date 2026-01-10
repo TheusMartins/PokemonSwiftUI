@@ -7,13 +7,7 @@
 
 import Foundation
 
-public enum PersistenceError: Error, Equatable, Sendable {
-    case invalidDirectoryURL
-    case failedToCreateDirectory
-    case failedToWriteFile
-    case failedToReadFile
-    case failedToDeleteFile
-    case failedToDeleteAllFiles
-    case decodingFailed
-    case encodingFailed
+public enum PersistenceError: Error, Sendable {
+    case unableToResolveDirectory
+    case unableToEncode(Error)
 }

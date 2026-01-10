@@ -7,21 +7,11 @@
 
 import Foundation
 
-/// A small key-value storage abstraction.
-///
-/// This is intentionally minimal: it helps keep higher layers decoupled from
-/// the concrete persistence mechanism (filesystem, user defaults, database, etc.).
+/// High-level persistence API used by features.
+/// Actor-friendly: async operations.
 public protocol DataStore: Sendable {
-    /// Returns raw data for the given key.
-    func data(forKey key: String) async throws -> Data?
-
-    /// Persists raw data for the given key.
-    /// Passing `nil` removes the stored value.
-    func set(_ data: Data?, forKey key: String) async throws
-
-    /// Removes the stored value for the given key.
-    func remove(forKey key: String) async throws
-
-    /// Removes all persisted values managed by this store.
+    func save(_ data: Data, for key: PersistenceKey) async throws
+    func load(for key: PersistenceKey) async throws -> Data?
+    func remove(for key: PersistenceKey) async throws
     func removeAll() async throws
 }

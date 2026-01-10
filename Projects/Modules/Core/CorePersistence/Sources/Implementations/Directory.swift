@@ -7,31 +7,26 @@
 
 import Foundation
 
-public enum Directory {
-    case documents
+public enum Directory: Sendable {
     case caches
-    case custom(URL)
+    case applicationSupport
+    case documents
+    case temporary
 
-    func url(using fileManager: FileManager) throws -> URL {
+    public func url(using fileManager: FileManager = .default) throws -> URL {
         switch self {
-        case .documents:
-            return try fileManager.url(
-                for: .documentDirectory,
-                in: .userDomainMask,
-                appropriateFor: nil,
-                create: false
-            )
-
         case .caches:
-            return try fileManager.url(
-                for: .cachesDirectory,
-                in: .userDomainMask,
-                appropriateFor: nil,
-                create: false
-            )
+            return try fileManager.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
 
-        case .custom(let url):
+        case .applicationSupport:
+            let url = try fileManager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
             return url
+
+        case .documents:
+            return try fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+
+        case .temporary:
+            return fileManager.temporaryDirectory
         }
     }
 }

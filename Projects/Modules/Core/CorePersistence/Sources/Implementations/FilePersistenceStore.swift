@@ -7,79 +7,53 @@
 
 import Foundation
 
-public final class FilePersistenceStore: PersistenceStore {
-
+/// File-based persistence store.
+///
+/// Implementation details:
+/// - Uses a base directory (Caches/Documents) and stores each key as a file.
+/// - Uses a `FilePersisting` abstraction for testability.
+/// - Actor-based API to showcase concurrency correctness.
+public actor FilePersistenceStore: DataStore {
     private let directoryURL: URL
-    private let fileManager: FileManager
+    private let filePersistor: FilePersisting
 
     public init(
-        directory: Directory,
+        directory: PersistenceDirectory,
+        filePersistor: FilePersisting = FileManagerFilePersistor(),
         fileManager: FileManager = .default
-    ) throws {
-        self.fileManager = fileManager
+    ) async throws {
+        self.filePersistor = filePersistor
         self.directoryURL = try directory.url(using: fileManager)
-        try createDirectoryIfNeeded()
+        try await filePersistor.createDirectoryIfNeeded(at: directoryURL)
     }
 
-    public func save(_ data: Data, for key: PersistableKey) throws {
+    public func save(_ data: Data, for key: PersistenceKey) async throws {
         let url = fileURL(for: key)
-        try data.write(to: url, options: .atomic)
+        try await filePersistor.write(data, to: url)
     }
 
-    public func load(for key: PersistableKey) throws -> Data? {
+    public func load(for key: PersistenceKey) async throws -> Data? {
         let url = fileURL(for: key)
-        guard fileManager.fileExists(atPath: url.path) else {
-            return nil
-        }
-        return try Data(contentsOf: url)
+        return try await filePersistor.contents(at: url)
     }
 
-    public func remove(for key: PersistableKey) throws {
+    public func remove(for key: PersistenceKey) async throws {
         let url = fileURL(for: key)
-        guard fileManager.fileExists(atPath: url.path) else { return }
-        try fileManager.removeItem(at: url)
+        try await filePersistor.removeItem(at: url)
     }
 
-    public func removeAll() throws {
-        let contents = try fileManager.contentsOfDirectory(
-            at: directoryURL,
-            includingPropertiesForKeys: nil
-        )
-
-        for file in contents {
-            try fileManager.removeItem(at: file)
-        }
+    public func removeAll() async throws {
+        try await filePersistor.removeContentsOfDirectory(at: directoryURL)
     }
 
     // MARK: - Helpers
 
-    private func fileURL(for key: PersistableKey) -> URL {
-        directoryURL.appendingPathComponent(key.rawValue)
-    }
+    private func fileURL(for key: PersistenceKey) -> URL {
+        // Very simple sanitize to avoid weird filenames in a showcase project
+        let safe = key.rawValue
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: ":", with: "_")
 
-    private func createDirectoryIfNeeded() throws {
-        guard !fileManager.fileExists(atPath: directoryURL.path) else { return }
-
-        try fileManager.createDirectory(
-            at: directoryURL,
-            withIntermediateDirectories: true
-        )
-    }
-}
-
-public extension FilePersistenceStore {
-
-    static func cacheStore(
-        folderName: String
-    ) throws -> FilePersistenceStore {
-        let baseURL = try FileManager.default.url(
-            for: .cachesDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: false
-        )
-
-        let folderURL = baseURL.appendingPathComponent(folderName)
-        return try FilePersistenceStore(directory: .custom(folderURL))
+        return directoryURL.appendingPathComponent("\(safe).data", isDirectory: false)
     }
 }
