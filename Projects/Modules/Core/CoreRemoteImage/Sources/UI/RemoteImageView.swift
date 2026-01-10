@@ -7,31 +7,32 @@
 
 import SwiftUI
 
-public struct RemoteImageView: View {
+public struct RemoteImageView<Placeholder: View, Loading: View, Failure: View>: View {
 
     private let url: URL?
     private let contentMode: ContentMode
-    private let showsLoader: Bool
-
-    private let placeholder: AnyView
-    private let failure: AnyView
+    private let placeholder: Placeholder
+    private let loading: Loading
+    private let failure: Failure
 
     @StateObject private var model: RemoteImageModel
 
     public init(
         url: URL?,
-        loader: any ImageLoading,
         contentMode: ContentMode = .fill,
-        showsLoader: Bool = true,
-        placeholder: () -> some View = { Color.clear },
-        failure: () -> some View = { Image(systemName: "exclamationmark.triangle").imageScale(.large) }
+        @ViewBuilder placeholder: () -> Placeholder,
+        @ViewBuilder loading: () -> Loading,
+        @ViewBuilder failure: () -> Failure
     ) {
         self.url = url
         self.contentMode = contentMode
-        self.showsLoader = showsLoader
-        self.placeholder = AnyView(placeholder())
-        self.failure = AnyView(failure())
-        _model = StateObject(wrappedValue: RemoteImageModel(loader: loader))
+        self.placeholder = placeholder()
+        self.loading = loading()
+        self.failure = failure()
+
+        _model = StateObject(
+            wrappedValue: RemoteImageModel()
+        )
     }
 
     public var body: some View {
@@ -42,9 +43,7 @@ public struct RemoteImageView: View {
 
             case .loading:
                 placeholder
-                if showsLoader {
-                    ProgressView()
-                }
+                loading
 
             case .success(let data):
                 RemoteImageDataView(data: data, contentMode: contentMode)
