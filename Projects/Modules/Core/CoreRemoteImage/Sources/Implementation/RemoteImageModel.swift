@@ -14,7 +14,7 @@ public final class RemoteImageModel: ObservableObject {
     private let loader: ImageLoading
     private var task: Task<Void, Never>?
 
-    public init(loader: ImageLoading) {
+    public init(loader: ImageLoading = RemoteImageLoader()) {
         self.loader = loader
     }
 

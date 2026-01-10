@@ -19,7 +19,7 @@ public actor RemoteImageLoader: ImageLoading {
     private let cache: ImageCaching
 
     public init(
-        requester: Requester,
+        requester: Requester = DefaultRequester(),
         cache: ImageCaching = InMemoryImageCache()
     ) {
         self.requester = requester
