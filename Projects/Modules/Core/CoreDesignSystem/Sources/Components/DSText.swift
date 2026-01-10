@@ -29,3 +29,43 @@ public struct DSText: View {
             .lineSpacing(style.typography.lineSpacing)
     }
 }
+
+#Preview("DSText – Light") {
+    ScrollView {
+        VStack(alignment: .leading, spacing: DSSpacing.md.value) {
+            ForEach(DSTextStyle.allCases, id: \.self) { style in
+                VStack(alignment: .leading, spacing: DSSpacing.xs.value) {
+                    DSText("\(style)", style: .title, color: .textSecondary)
+
+                    DSText(
+                        "The quick brown fox jumps over the lazy Pikachu",
+                        style: style
+                    )
+                }
+            }
+        }
+        .padding(DSSpacing.lg.value)
+    }
+    .background(DSColorToken.background.color)
+    .preferredColorScheme(.light)
+}
+
+#Preview("DSText – Dark") {
+    ScrollView {
+        VStack(alignment: .leading, spacing: DSSpacing.md.value) {
+            ForEach(DSTextStyle.allCases, id: \.self) { style in
+                VStack(alignment: .leading, spacing: DSSpacing.xs.value) {
+                    DSText("\(style)", style: .title, color: .textSecondary)
+
+                    DSText(
+                        "The quick brown fox jumps over the lazy Pikachu",
+                        style: style
+                    )
+                }
+            }
+        }
+        .padding(DSSpacing.lg.value)
+    }
+    .background(DSColorToken.background.color)
+    .preferredColorScheme(.dark)
+}
