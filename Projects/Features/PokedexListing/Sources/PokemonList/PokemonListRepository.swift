@@ -9,8 +9,8 @@ import CoreNetworking
 import Foundation
 
 protocol PokemonListRepository {
-    func getGenerations() async throws -> [PokemonGenerationModel]
-    func getPokemon(generationId: Int) async throws -> [PokemonListModel]
+    func getGenerations() async throws -> PokemonGenerationModel
+    func getPokemon(generationId: Int) async throws -> PokemonListModel
 }
 
 final class PokemonListRepositoryImpl: PokemonListRepository {
@@ -20,12 +20,14 @@ final class PokemonListRepositoryImpl: PokemonListRepository {
         self.requester = requester
     }
     
-    func getGenerations() async throws -> [PokemonGenerationModel] {
-        return []
+    func getGenerations() async throws -> PokemonGenerationModel {
+        let response = try await requester.request(basedOn: PokemonListRequests.getGenerations)
+        return try await parseGenerationResponse(response: response)
     }
     
-    func getPokemon(generationId: Int) async throws -> [PokemonListModel] {
-        return []
+    func getPokemon(generationId: Int) async throws -> PokemonListModel {
+        let response = try await requester.request(basedOn: PokemonListRequests.getPokemons(generationId: generationId))
+        return try await parsePokemonResponse(response: response)
     }
     
     // MARK: - Private methods
