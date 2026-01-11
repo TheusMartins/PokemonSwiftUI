@@ -11,7 +11,10 @@ let project = Project(
             deploymentTargets: .iOS("17.0"),
             infoPlist: .default,
             sources: ["Sources/**"],
-            resources: []
+            resources: [],
+            dependencies: [
+                .project(target: "CoreRemoteImage", path: "../CoreRemoteImage")
+            ]
         ),
         .target(
             name: "CoreDesignSystemTests",
