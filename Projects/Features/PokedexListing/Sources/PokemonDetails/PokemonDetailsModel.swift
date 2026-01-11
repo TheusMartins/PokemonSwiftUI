@@ -5,6 +5,7 @@
 //  Created by Matheus Martins on 11/01/26.
 //
 
+import CoreDesignSystem
 import Foundation
 import SwiftUI
 
@@ -106,35 +107,39 @@ enum PokemonStatKind: String, CaseIterable, Equatable, Sendable {
     }
 }
 
-enum PokemonType: String, CaseIterable, Equatable, Sendable, Decodable {
+enum PokemonType: String, CaseIterable, Equatable, Sendable, Decodable, Identifiable {
     case normal, fire, water, electric, grass, ice
     case fighting, poison, ground, flying, psychic, bug
     case rock, ghost, dragon, dark, steel, fairy
+    
+    var id: String { rawValue }
 
     var displayName: String { rawValue.capitalized }
 
-    var color: Color {
+    var colorToken: DSColorToken {
         switch self {
-        case .normal: return .gray.opacity(0.65)
-        case .fire: return .red.opacity(0.85)
-        case .water: return .blue.opacity(0.85)
-        case .electric: return .yellow.opacity(0.85)
-        case .grass: return .green.opacity(0.85)
-        case .ice: return .cyan.opacity(0.85)
-        case .fighting: return .orange.opacity(0.85)
-        case .poison: return .purple.opacity(0.85)
-        case .ground: return .brown.opacity(0.75)
-        case .flying: return .indigo.opacity(0.75)
-        case .psychic: return .pink.opacity(0.85)
-        case .bug: return .green.opacity(0.65)
-        case .rock: return .brown.opacity(0.85)
-        case .ghost: return .indigo.opacity(0.85)
-        case .dragon: return .teal.opacity(0.85)
-        case .dark: return .black.opacity(0.75)
-        case .steel: return .gray.opacity(0.85)
-        case .fairy: return .pink.opacity(0.65)
+        case .normal: return .pokemonTypeNormal
+        case .fire: return .pokemonTypeFire
+        case .water: return .pokemonTypeWater
+        case .electric: return .pokemonTypeElectric
+        case .grass: return .pokemonTypeGrass
+        case .ice: return .pokemonTypeIce
+        case .fighting: return .pokemonTypeFighting
+        case .poison: return .pokemonTypePoison
+        case .ground: return .pokemonTypeGround
+        case .flying: return .pokemonTypeFlying
+        case .psychic: return .pokemonTypePsychic
+        case .bug: return .pokemonTypeBug
+        case .rock: return .pokemonTypeRock
+        case .ghost: return .pokemonTypeGhost
+        case .dragon: return .pokemonTypeDragon
+        case .dark: return .pokemonTypeDark
+        case .steel: return .pokemonTypeSteel
+        case .fairy: return .pokemonTypeFairy
         }
     }
 
-    var secondaryColor: Color { color.opacity(0.55) }
+    var secondaryColorToken: DSColorToken {
+        colorToken
+    }
 }

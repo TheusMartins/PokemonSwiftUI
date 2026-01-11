@@ -49,11 +49,6 @@ public struct DSStatsCardView: View {
             VStack(spacing: 0) {
                 ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
                     DSStatProgressRowView(title: row.title, value: row.value, progress: row.progress, barToken: row.barToken)
-
-                    if index < rows.count - 1 {
-                        Divider()
-                            .overlay(DSColorToken.border.color.opacity(0.5))
-                    }
                 }
             }
             .padding(DSSpacing.md.value)
