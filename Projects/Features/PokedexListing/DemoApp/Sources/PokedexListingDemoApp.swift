@@ -5,7 +5,7 @@ import PokedexListing
 struct PokedexListingDemoApp: App {
     var body: some Scene {
         WindowGroup {
-            PokedexListingRootView()
+            PokedexListingRouteView()
         }
     }
 }

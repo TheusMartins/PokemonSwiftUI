@@ -7,6 +7,6 @@
 
 import Foundation
 
-public enum PokedexListingRoute: Hashable {
-    case details(pokemonName: String)
+enum PokedexListingRoute: Hashable {
+    case pokemonDetails(name: String)
 }
