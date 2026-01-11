@@ -54,7 +54,7 @@ public struct RemoteImageView<Placeholder: View, Loading: View, Failure: View>: 
             }
         }
         .task(id: url) {
-            model.load(url: url)
+            await model.load(url: url)
         }
     }
 }

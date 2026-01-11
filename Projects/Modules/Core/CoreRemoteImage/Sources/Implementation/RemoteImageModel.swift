@@ -18,7 +18,7 @@ public final class RemoteImageModel: ObservableObject {
         self.loader = loader
     }
 
-    public func load(url: URL?) {
+    public func load(url: URL?) async {
         task?.cancel()
         state = .idle
 
