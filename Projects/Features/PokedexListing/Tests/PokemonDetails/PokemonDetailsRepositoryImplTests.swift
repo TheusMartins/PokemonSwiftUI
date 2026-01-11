@@ -18,7 +18,11 @@ final class PokemonDetailsRepositoryImplTests: XCTestCase {
         let spy = RequesterSpy()
         let sut = makeSUT(requester: spy)
 
-        spy.stubbedResult = .success(makeSuccessResponse(data: pokemonDetailsJSONData(name: "Scizor")))
+        spy.stubbedResult = .success(
+            makeSuccessResponse(
+                data: PokemonDetailsFixture.jsonData(name: "Scizor")
+            )
+        )
 
         // When
         _ = try await sut.getPokemonDetails(name: "Scizor".lowercased())
@@ -37,7 +41,11 @@ final class PokemonDetailsRepositoryImplTests: XCTestCase {
         let spy = RequesterSpy()
         let sut = makeSUT(requester: spy)
 
-        spy.stubbedResult = .success(makeSuccessResponse(data: pokemonDetailsJSONData(id: 212, name: "Scizor")))
+        spy.stubbedResult = .success(
+            makeSuccessResponse(
+                data: PokemonDetailsFixture.jsonData(id: 212, name: "Scizor")
+            )
+        )
 
         // When
         let model = try await sut.getPokemonDetails(name: "Scizor")
@@ -91,37 +99,6 @@ final class PokemonDetailsRepositoryImplTests: XCTestCase {
     private func makeSUT(requester: RequesterSpy) -> PokemonDetailsRepositoryImpl {
         PokemonDetailsRepositoryImpl(requester: requester)
     }
-}
-
-// MARK: - Fixtures
-
-private func pokemonDetailsJSONData(
-    id: Int = 123,
-    name: String = "scizor"
-) -> Data {
-    let json = """
-    {
-      "id": \(id),
-      "name": "\(name.lowercased())",
-      "sprites": {
-        "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/212.png",
-        "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/212.png"
-      },
-      "types": [
-        { "slot": 1, "type": { "name": "bug" } },
-        { "slot": 2, "type": { "name": "steel" } }
-      ],
-      "stats": [
-        { "base_stat": 70, "stat": { "name": "hp" } },
-        { "base_stat": 130, "stat": { "name": "attack" } },
-        { "base_stat": 100, "stat": { "name": "defense" } },
-        { "base_stat": 55, "stat": { "name": "special-attack" } },
-        { "base_stat": 80, "stat": { "name": "special-defense" } },
-        { "base_stat": 65, "stat": { "name": "speed" } }
-      ]
-    }
-    """
-    return Data(json.utf8)
 }
 
 /// Adjust ONLY here if RequestSuccessResponse initializer differs.
