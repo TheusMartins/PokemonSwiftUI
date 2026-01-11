@@ -11,12 +11,13 @@ import CoreDesignSystem
 
 struct PokemonListView: View {
     @StateObject private var viewModel: PokemonListViewModel = .init()
+    let onPokemonSelected: (String) -> Void
     
     public var body: some View {
         Group {
             switch viewModel.state {
             case .idle:
-                EmptyView()
+                DSLoadingView(size: 60)
             case .loading:
                 DSLoadingView(size: 60)
             case .loaded:
@@ -24,8 +25,11 @@ struct PokemonListView: View {
                     makePicker(generations: viewModel.generations)
                     makeList(pokemons: viewModel.pokemons)
                 }
-            case .failed(_):
-                EmptyView()
+            case .failed(let errorMessage):
+                VStack(spacing: 12) {
+                    DSText(errorMessage, style: .body)
+                    Button("Retry") { Task { await viewModel.load() } }
+                }
             }
         }
         .background(DSColorToken.background.color)
@@ -57,9 +61,14 @@ struct PokemonListView: View {
     
     private func makeList(pokemons: [PokemonModel]) -> some View {
         List(pokemons) { pokemon in
-            PokemonItemListView(url: pokemon.imageURL ?? pokemon.url, pokemonName: pokemon.name)
-                .listRowBackground(DSColorToken.background.color)
-                .listRowSeparator(.hidden)
+            Button {
+                onPokemonSelected(pokemon.name)
+            } label: {
+                PokemonItemListView(url: pokemon.imageURL ?? pokemon.url, pokemonName: pokemon.name)
+            }
+            .buttonStyle(.plain)
+            .listRowBackground(DSColorToken.background.color)
+            .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
