@@ -55,7 +55,8 @@ final class PokemonListViewModel: ObservableObject {
     func changeGeneration(to generation: GenerationModel) async {
         selectedGeneration = generation
 
-        guard let id = selectedGeneration?.name else {
+        let id = generation.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !id.isEmpty else {
             state = .failed(message: "Invalid generation id")
             return
         }
