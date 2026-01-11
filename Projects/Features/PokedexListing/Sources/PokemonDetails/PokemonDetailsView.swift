@@ -60,36 +60,9 @@ struct PokemonDetailsView: View {
         let frontShiny = viewModel.model?.sprites.frontShiny
 
         return HStack(spacing: DSSpacing.large.value) {
-            makeSpriteCard(title: "Default", url: frontDefault)
-            makeSpriteCard(title: "Shiny", url: frontShiny)
+            DSRemoteImageCardView(title: "Default", url: frontDefault)
+            DSRemoteImageCardView(title: "Shiny", url: frontShiny)
         }
-    }
-
-    private func makeSpriteCard(title: String, url: URL?) -> some View {
-        VStack(alignment: .leading, spacing: DSSpacing.medium.value) {
-            DSText(title, style: .body, color: .textSecondary)
-
-            ZStack {
-                RoundedRectangle(cornerRadius: DSRadius.large.value, style: .continuous)
-                    .fill(DSColorToken.surface.color)
-
-                Group {
-                    if let url {
-                        RemoteImageView(
-                            url: url,
-                            placeholder: { Color.clear },
-                            loading: { DSLoadingView() },
-                            failure: { Image(systemName: "photo").imageScale(.large) }
-                        )
-                        .padding(DSSpacing.large.value)
-                    } else {
-                        DSText("No image", style: .body, color: .textSecondary)
-                    }
-                }
-            }
-            .frame(height: 160)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // MARK: - Types
