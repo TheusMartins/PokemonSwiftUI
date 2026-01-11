@@ -17,16 +17,16 @@ struct PokemonListView: View {
         Group {
             switch viewModel.state {
             case .idle:
-                DSLoadingView(size: 60)
+                DSLoadingView(size: DSIconSize.huge.value)
             case .loading:
-                DSLoadingView(size: 60)
+                DSLoadingView(size: DSIconSize.huge.value)
             case .loaded:
                 VStack() {
                     makePicker(generations: viewModel.generations)
                     makeList(pokemons: viewModel.pokemons)
                 }
             case .failed(let errorMessage):
-                VStack(spacing: 12) {
+                VStack(spacing: DSSpacing.medium.value) {
                     DSText(errorMessage, style: .body)
                     Button("Retry") { Task { await viewModel.load() } }
                 }

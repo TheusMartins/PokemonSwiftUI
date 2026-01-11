@@ -23,7 +23,7 @@ struct PokemonDetailsView: View {
                 EmptyView()
 
             case .loading:
-                DSLoadingView(size: 60)
+                DSLoadingView(size: DSIconSize.huge.value)
 
             case .loaded:
                 makeContent()
@@ -70,7 +70,7 @@ struct PokemonDetailsView: View {
             DSText(title, style: .body, color: .textSecondary)
 
             ZStack {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                RoundedRectangle(cornerRadius: DSRadius.large.value, style: .continuous)
                     .fill(DSColorToken.surface.color)
 
                 Group {
@@ -78,7 +78,7 @@ struct PokemonDetailsView: View {
                         RemoteImageView(
                             url: url,
                             placeholder: { Color.clear },
-                            loading: { DSLoadingView(size: 22) },
+                            loading: { DSLoadingView() },
                             failure: { Image(systemName: "photo").imageScale(.large) }
                         )
                         .padding(DSSpacing.large.value)
@@ -120,7 +120,7 @@ struct PokemonDetailsView: View {
     private func makeStatsSection() -> some View {
         if let model = viewModel.model {
             let rows: [DSStatsCardView.Row] = PokemonStatKind.allCases.map { kind in
-                let value = model.statValue(kind) ?? 0
+                let value = model.statValue(kind) ?? .zero
 
                 return .init(
                     id: kind.rawValue,

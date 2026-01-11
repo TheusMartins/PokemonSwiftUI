@@ -18,10 +18,10 @@ struct PokemonItemListView: View {
             RemoteImageView(
                 url: url,
                 placeholder: { Color.clear },
-                loading: { DSLoadingView(size: 22) },
+                loading: { DSLoadingView() },
                 failure: { Image(systemName: "photo").imageScale(.large) }
             )
-            .frame(width: 80, height: 80)
+            .frame(width: DSIconSize.massive.value, height: DSIconSize.massive.value)
             .clipped()
             
             DSText(pokemonName, style: .title)
