@@ -20,7 +20,7 @@ public struct DSTypography: Sendable {
     public let font: Font
     public let lineSpacing: CGFloat
 
-    public init(font: Font, lineSpacing: CGFloat = 0) {
+    public init(font: Font, lineSpacing: CGFloat = .zero) {
         self.font = font
         self.lineSpacing = lineSpacing
     }

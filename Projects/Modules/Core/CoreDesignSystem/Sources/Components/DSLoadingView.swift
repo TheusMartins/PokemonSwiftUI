@@ -12,7 +12,7 @@ public struct DSLoadingView: View {
     private let lineWidth: CGFloat
 
     public init(
-        size: CGFloat = 22,
+        size: CGFloat = DSIconSize.medium.value,
         lineWidth: CGFloat = 3
     ) {
         self.size = size
@@ -64,7 +64,7 @@ private struct Spinner: View {
         DSColorToken.background.color
             .ignoresSafeArea()
 
-        DSLoadingView()
+        DSLoadingView(size: DSIconSize.huge.value)
     }
     .preferredColorScheme(.light)
 }
@@ -74,7 +74,7 @@ private struct Spinner: View {
         DSColorToken.background.color
             .ignoresSafeArea()
 
-        DSLoadingView()
+        DSLoadingView(size: DSIconSize.huge.value)
     }
     .preferredColorScheme(.dark)
 }

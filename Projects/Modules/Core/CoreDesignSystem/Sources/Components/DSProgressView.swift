@@ -13,9 +13,9 @@ public struct DSProgressView: View {
 
         var height: CGFloat {
             switch self {
-            case .small: return 8
-            case .medium: return 10
-            case .large: return 12
+            case .small: return DSSpacing.small.value
+            case .medium: return DSSpacing.medium.value
+            case .large: return DSSpacing.large.value
             }
         }
     }
@@ -25,7 +25,7 @@ public struct DSProgressView: View {
     private let trackColor: Color
     private let fillColor: Color
 
-    @State private var displayProgress: CGFloat = 0
+    @State private var displayProgress: CGFloat = .zero
 
     public init(
         progress: CGFloat,
@@ -53,7 +53,7 @@ public struct DSProgressView: View {
                     .frame(width: width * displayProgress, height: size.height)
             }
             .onAppear {
-                displayProgress = 0
+                displayProgress = .zero
                 withAnimation(.easeOut(duration: 0.7)) {
                     displayProgress = progress
                 }
@@ -66,4 +66,160 @@ public struct DSProgressView: View {
         }
         .frame(height: size.height)
     }
+}
+
+#Preview("DSProgressView – Light") {
+    ScrollView {
+        VStack(alignment: .leading, spacing: DSSpacing.large.value) {
+
+            DSText("Small", style: .title, color: .textSecondary)
+
+            VStack(spacing: DSSpacing.small.value) {
+                DSProgressView(
+                    progress: 0.15,
+                    size: .small,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonRed.color
+                )
+
+                DSProgressView(
+                    progress: 0.65,
+                    size: .small,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonYellow.color
+                )
+
+                DSProgressView(
+                    progress: 1.0,
+                    size: .small,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonBlue.color
+                )
+            }
+
+            DSText("Medium", style: .title, color: .textSecondary)
+
+            VStack(spacing: DSSpacing.small.value) {
+                DSProgressView(
+                    progress: 0.0,
+                    size: .medium,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonRed.color
+                )
+
+                DSProgressView(
+                    progress: 0.45,
+                    size: .medium,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonYellow.color
+                )
+
+                DSProgressView(
+                    progress: 0.85,
+                    size: .medium,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonBlue.color
+                )
+            }
+
+            DSText("Large", style: .title, color: .textSecondary)
+
+            VStack(spacing: DSSpacing.small.value) {
+                DSProgressView(
+                    progress: 0.25,
+                    size: .large,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonRed.color
+                )
+
+                DSProgressView(
+                    progress: 0.75,
+                    size: .large,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonYellow.color
+                )
+            }
+        }
+        .padding(DSSpacing.xLarge.value)
+    }
+    .background(DSColorToken.background.color)
+    .preferredColorScheme(.light)
+}
+
+#Preview("DSProgressView – Dark") {
+    ScrollView {
+        VStack(alignment: .leading, spacing: DSSpacing.large.value) {
+
+            DSText("Small", style: .title, color: .textSecondary)
+
+            VStack(spacing: DSSpacing.small.value) {
+                DSProgressView(
+                    progress: 0.15,
+                    size: .small,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonRed.color
+                )
+
+                DSProgressView(
+                    progress: 0.65,
+                    size: .small,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonYellow.color
+                )
+
+                DSProgressView(
+                    progress: 1.0,
+                    size: .small,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonBlue.color
+                )
+            }
+
+            DSText("Medium", style: .title, color: .textSecondary)
+
+            VStack(spacing: DSSpacing.small.value) {
+                DSProgressView(
+                    progress: 0.0,
+                    size: .medium,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonRed.color
+                )
+
+                DSProgressView(
+                    progress: 0.45,
+                    size: .medium,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonYellow.color
+                )
+
+                DSProgressView(
+                    progress: 0.85,
+                    size: .medium,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonBlue.color
+                )
+            }
+
+            DSText("Large", style: .title, color: .textSecondary)
+
+            VStack(spacing: DSSpacing.small.value) {
+                DSProgressView(
+                    progress: 0.25,
+                    size: .large,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonRed.color
+                )
+
+                DSProgressView(
+                    progress: 0.75,
+                    size: .large,
+                    trackColor: DSColorToken.surface.color.opacity(0.6),
+                    fillColor: DSColorToken.pokemonYellow.color
+                )
+            }
+        }
+        .padding(DSSpacing.xLarge.value)
+    }
+    .background(DSColorToken.background.color)
+    .preferredColorScheme(.dark)
 }

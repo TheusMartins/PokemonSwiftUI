@@ -199,3 +199,84 @@ public extension DSColorToken {
         }
     }
 }
+
+// MARK: - Previews
+
+private struct DSColorTokenCatalogView: View {
+    private let columns: [GridItem] = [
+        GridItem(.adaptive(minimum: 160), spacing: DSSpacing.medium.value)
+    ]
+
+    var body: some View {
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: DSSpacing.medium.value) {
+                ForEach(DSColorToken.allCases, id: \.self) { token in
+                    row(token)
+                }
+            }
+            .padding(DSSpacing.xLarge.value)
+        }
+        .background(DSColorToken.background.color)
+    }
+
+    private func row(_ token: DSColorToken) -> some View {
+        HStack(alignment: .center, spacing: DSSpacing.medium.value) {
+            RoundedRectangle(cornerRadius: DSRadius.small.value, style: .continuous)
+                .fill(token.color)
+                .frame(width: 36, height: 36)
+                .overlay(
+                    RoundedRectangle(cornerRadius: DSRadius.small.value, style: .continuous)
+                        .stroke(DSColorToken.border.color, lineWidth: 1)
+                )
+
+            VStack(alignment: .leading, spacing: DSSpacing.tiny.value) {
+                DSText(String(describing: token), style: .body)
+                    .lineLimit(1)
+
+                DSText(token.uiColor.dsHexString, style: .caption, color: .textSecondary)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(DSSpacing.medium.value)
+        .background(DSColorToken.surface.color)
+        .clipShape(RoundedRectangle(cornerRadius: DSRadius.medium.value, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: DSRadius.medium.value, style: .continuous)
+                .stroke(DSColorToken.border.color.opacity(0.6), lineWidth: 1)
+        )
+    }
+}
+
+private extension UIColor {
+    var dsHexString: String {
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+
+        getRed(&r, green: &g, blue: &b, alpha: &a)
+
+        let ri = Int(round(r * 255))
+        let gi = Int(round(g * 255))
+        let bi = Int(round(b * 255))
+        let ai = Int(round(a * 255))
+
+        // #RRGGBB or #RRGGBBAA
+        if ai == 255 {
+            return String(format: "#%02X%02X%02X", ri, gi, bi)
+        } else {
+            return String(format: "#%02X%02X%02X%02X", ri, gi, bi, ai)
+        }
+    }
+}
+
+#Preview("DSColorToken – Light") {
+    DSColorTokenCatalogView()
+        .preferredColorScheme(.light)
+}
+
+#Preview("DSColorToken – Dark") {
+    DSColorTokenCatalogView()
+        .preferredColorScheme(.dark)
+}

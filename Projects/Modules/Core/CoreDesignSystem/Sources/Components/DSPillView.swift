@@ -9,39 +9,39 @@ import SwiftUI
 
 public struct DSPillView: View {
     public enum Size: Sendable {
-        case sm
-        case md
-        case lg
+        case small
+        case medium
+        case large
 
         var horizontalPadding: CGFloat {
             switch self {
-            case .sm: return 8
-            case .md: return 10
-            case .lg: return 12
+            case .small: return DSSpacing.small.value
+            case .medium: return DSSpacing.medium.value
+            case .large: return DSSpacing.large.value
             }
         }
 
         var verticalPadding: CGFloat {
             switch self {
-            case .sm: return 4
-            case .md: return 6
-            case .lg: return 8
+            case .small: return DSSpacing.small.value / 2
+            case .medium: return DSSpacing.small.value * 0.75
+            case .large: return DSSpacing.small.value
             }
         }
 
         var cornerRadius: CGFloat {
             switch self {
-            case .sm: return 10
-            case .md: return 12
-            case .lg: return 14
+            case .small: return DSRadius.small.value
+            case .medium: return DSRadius.medium.value
+            case .large: return DSRadius.large.value
             }
         }
 
         var font: Font {
             switch self {
-            case .sm: return .caption
-            case .md: return .callout
-            case .lg: return .subheadline
+            case .small: return .caption
+            case .medium: return .callout
+            case .large: return .subheadline
             }
         }
     }
@@ -56,7 +56,7 @@ public struct DSPillView: View {
 
     public init(
         _ text: String,
-        size: Size = .md,
+        size: Size = .medium,
         background: Color,
         foreground: Color = .white,
         border: Color? = nil,
@@ -98,7 +98,7 @@ public struct DSPillView: View {
 public extension DSPillView {
     init(
         _ text: String,
-        size: Size = .md,
+        size: Size = .medium,
         backgroundToken: DSColorToken,
         foregroundToken: DSColorToken = .brandPrimaryOn,
         borderToken: DSColorToken? = nil,
@@ -115,4 +115,106 @@ public extension DSPillView {
             isUppercased: isUppercased
         )
     }
+}
+
+#Preview("DSPillView – Light") {
+    VStack(alignment: .leading, spacing: DSSpacing.large.value) {
+
+        DSText("Small", style: .title, color: .textSecondary)
+        HStack(spacing: DSSpacing.small.value) {
+            DSPillView("Fire", size: .small, backgroundToken: .pokemonRed)
+            DSPillView("Water", size: .small, backgroundToken: .pokemonBlue)
+            DSPillView(
+                "Electric",
+                size: .small,
+                backgroundToken: .pokemonYellow,
+                foregroundToken: .textPrimary
+            )
+        }
+
+        DSText("Medium", style: .title, color: .textSecondary)
+        HStack(spacing: DSSpacing.small.value) {
+            DSPillView("Default", size: .medium, backgroundToken: .brandSecondary)
+            DSPillView(
+                "Bordered",
+                size: .medium,
+                backgroundToken: .surface,
+                foregroundToken: .textPrimary,
+                borderToken: .border
+            )
+            DSPillView(
+                "UPPER",
+                size: .medium,
+                backgroundToken: .brandPrimary,
+                isUppercased: true
+            )
+        }
+
+        DSText("Large", style: .title, color: .textSecondary)
+        HStack(spacing: DSSpacing.small.value) {
+            DSPillView("Grass", size: .large, backgroundToken: .brandPrimary)
+            DSPillView(
+                "Surface",
+                size: .large,
+                backgroundToken: .surface,
+                foregroundToken: .textPrimary,
+                borderToken: .border
+            )
+        }
+    }
+    .padding(DSSpacing.xLarge.value)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(DSColorToken.background.color)
+    .preferredColorScheme(.light)
+}
+
+#Preview("DSPillView – Dark") {
+    VStack(alignment: .leading, spacing: DSSpacing.large.value) {
+
+        DSText("Small", style: .title, color: .textSecondary)
+        HStack(spacing: DSSpacing.small.value) {
+            DSPillView("Fire", size: .small, backgroundToken: .pokemonRed)
+            DSPillView("Water", size: .small, backgroundToken: .pokemonBlue)
+            DSPillView(
+                "Electric",
+                size: .small,
+                backgroundToken: .pokemonYellow,
+                foregroundToken: .textPrimary
+            )
+        }
+
+        DSText("Medium", style: .title, color: .textSecondary)
+        HStack(spacing: DSSpacing.small.value) {
+            DSPillView("Default", size: .medium, backgroundToken: .brandSecondary)
+            DSPillView(
+                "Bordered",
+                size: .medium,
+                backgroundToken: .surface,
+                foregroundToken: .textPrimary,
+                borderToken: .border
+            )
+            DSPillView(
+                "UPPER",
+                size: .medium,
+                backgroundToken: .brandPrimary,
+                isUppercased: true
+            )
+        }
+
+        DSText("Large", style: .title, color: .textSecondary)
+        HStack(spacing: DSSpacing.small.value) {
+            DSPillView("Grass", size: .large, backgroundToken: .brandPrimary)
+            DSPillView(
+                "Surface",
+                size: .large,
+                backgroundToken: .surface,
+                foregroundToken: .textPrimary,
+                borderToken: .border
+            )
+        }
+    }
+    .padding(DSSpacing.xLarge.value)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(DSColorToken.background.color)
+    .preferredColorScheme(.dark)
 }

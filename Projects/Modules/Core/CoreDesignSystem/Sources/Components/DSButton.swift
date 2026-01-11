@@ -37,26 +37,26 @@ public struct DSButton: View {
         Button {
             action()
         } label: {
-            HStack(spacing: DSSpacing.xs.value) {
+            HStack(spacing: DSSpacing.small.value) {
                 if isLoading {
                     DSLoadingView()
                 }
                 DSText(title, style: .bodyEmphasis, color: titleColorToken)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, DSSpacing.sm.value)
-            .padding(.horizontal, DSSpacing.md.value)
+            .padding(.vertical, DSSpacing.medium.value)
+            .padding(.horizontal, DSSpacing.large.value)
         }
         .buttonStyle(.plain)
         .background(backgroundColor)
         .overlay(borderOverlay)
-        .clipShape(RoundedRectangle(cornerRadius: DSRadius.md.value))
+        .clipShape(RoundedRectangle(cornerRadius: DSRadius.medium.value))
         .opacity(isEnabled ? 1 : 0.5)
         .disabled(!isEnabled || isLoading)
     }
 
     private var backgroundColor: some View {
-        RoundedRectangle(cornerRadius: DSRadius.md.value)
+        RoundedRectangle(cornerRadius: DSRadius.medium.value)
             .fill(
                 style == .primary
                 ? DSColorToken.brandPrimary.color
@@ -65,7 +65,7 @@ public struct DSButton: View {
     }
 
     private var borderOverlay: some View {
-        RoundedRectangle(cornerRadius: DSRadius.md.value)
+        RoundedRectangle(cornerRadius: DSRadius.medium.value)
             .stroke(DSColorToken.border.color, lineWidth: style == .secondary ? 1 : 0)
     }
 
@@ -79,7 +79,7 @@ public struct DSButton: View {
 private struct DSButtonPreviewScreen: View {
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: DSSpacing.lg.value) {
+            VStack(alignment: .leading, spacing: DSSpacing.xLarge.value) {
 
                 section("Primary") {
                     buttonRow(
@@ -105,7 +105,7 @@ private struct DSButtonPreviewScreen: View {
                     )
                 }
             }
-            .padding(DSSpacing.lg.value)
+            .padding(DSSpacing.xLarge.value)
             .background(DSColorToken.background.color)
         }
     }
@@ -113,14 +113,14 @@ private struct DSButtonPreviewScreen: View {
     // MARK: - UI helpers
 
     private func section(_ title: String, @ViewBuilder content: () -> some View) -> some View {
-        VStack(alignment: .leading, spacing: DSSpacing.sm.value) {
+        VStack(alignment: .leading, spacing: DSSpacing.medium.value) {
             DSText(title, style: .title, color: .textPrimary)
             content()
         }
     }
 
     private func buttonRow(_ first: DSButton, _ second: DSButton, _ third: DSButton) -> some View {
-        VStack(spacing: DSSpacing.sm.value) {
+        VStack(spacing: DSSpacing.medium.value) {
             first
             second
             third

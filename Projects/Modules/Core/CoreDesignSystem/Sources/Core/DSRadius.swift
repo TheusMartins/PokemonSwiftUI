@@ -7,10 +7,18 @@
 
 import Foundation
 
+/// Design System corner radius tokens.
+/// Values are expressed in points (pt).
 public enum DSRadius: CGFloat, CaseIterable, Sendable {
-    case sm = 8
-    case md = 12
-    case lg = 16
+
+    /// Small radius (8pt)
+    case small = 8
+
+    /// Medium radius (12pt)
+    case medium = 12
+
+    /// Large radius (16pt)
+    case large = 16
 
     public var value: CGFloat { rawValue }
 }

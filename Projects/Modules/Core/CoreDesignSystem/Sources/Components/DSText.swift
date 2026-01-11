@@ -32,9 +32,9 @@ public struct DSText: View {
 
 #Preview("DSText – Light") {
     ScrollView {
-        VStack(alignment: .leading, spacing: DSSpacing.md.value) {
+        VStack(alignment: .leading, spacing: DSSpacing.large.value) {
             ForEach(DSTextStyle.allCases, id: \.self) { style in
-                VStack(alignment: .leading, spacing: DSSpacing.xs.value) {
+                VStack(alignment: .leading, spacing: DSSpacing.small.value) {
                     DSText("\(style)", style: .title, color: .textSecondary)
 
                     DSText(
@@ -44,7 +44,7 @@ public struct DSText: View {
                 }
             }
         }
-        .padding(DSSpacing.lg.value)
+        .padding(DSSpacing.xLarge.value)
     }
     .background(DSColorToken.background.color)
     .preferredColorScheme(.light)
@@ -52,9 +52,9 @@ public struct DSText: View {
 
 #Preview("DSText – Dark") {
     ScrollView {
-        VStack(alignment: .leading, spacing: DSSpacing.md.value) {
+        VStack(alignment: .leading, spacing: DSSpacing.large.value) {
             ForEach(DSTextStyle.allCases, id: \.self) { style in
-                VStack(alignment: .leading, spacing: DSSpacing.xs.value) {
+                VStack(alignment: .leading, spacing: DSSpacing.small.value) {
                     DSText("\(style)", style: .title, color: .textSecondary)
 
                     DSText(
@@ -64,7 +64,7 @@ public struct DSText: View {
                 }
             }
         }
-        .padding(DSSpacing.lg.value)
+        .padding(DSSpacing.xLarge.value)
     }
     .background(DSColorToken.background.color)
     .preferredColorScheme(.dark)

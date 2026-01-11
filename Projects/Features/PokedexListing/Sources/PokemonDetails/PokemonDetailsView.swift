@@ -44,14 +44,14 @@ struct PokemonDetailsView: View {
 
     private func makeContent() -> some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: DSSpacing.lg.value) {
+            VStack(alignment: .leading, spacing: DSSpacing.xLarge.value) {
                 makeSpritesRow()
                 makeTypesSection()
                 makeStatsSection()
             }
-            .padding(.horizontal, DSSpacing.lg.value)
-            .padding(.top, DSSpacing.md.value)
-            .padding(.bottom, DSSpacing.xl.value)
+            .padding(.horizontal, DSSpacing.xLarge.value)
+            .padding(.top, DSSpacing.large.value)
+            .padding(.bottom, DSSpacing.huge.value)
         }
     }
 
@@ -59,14 +59,14 @@ struct PokemonDetailsView: View {
         let frontDefault = viewModel.model?.sprites.frontDefault
         let frontShiny = viewModel.model?.sprites.frontShiny
 
-        return HStack(spacing: DSSpacing.md.value) {
+        return HStack(spacing: DSSpacing.large.value) {
             makeSpriteCard(title: "Default", url: frontDefault)
             makeSpriteCard(title: "Shiny", url: frontShiny)
         }
     }
 
     private func makeSpriteCard(title: String, url: URL?) -> some View {
-        VStack(alignment: .leading, spacing: DSSpacing.sm.value) {
+        VStack(alignment: .leading, spacing: DSSpacing.medium.value) {
             DSText(title, style: .body, color: .textSecondary)
 
             ZStack {
@@ -81,7 +81,7 @@ struct PokemonDetailsView: View {
                             loading: { DSLoadingView(size: 22) },
                             failure: { Image(systemName: "photo").imageScale(.large) }
                         )
-                        .padding(DSSpacing.md.value)
+                        .padding(DSSpacing.large.value)
                     } else {
                         DSText("No image", style: .body, color: .textSecondary)
                     }
@@ -97,11 +97,11 @@ struct PokemonDetailsView: View {
     @ViewBuilder
     private func makeTypesSection() -> some View {
         if let types = viewModel.model?.types, !types.isEmpty {
-            VStack(alignment: .leading, spacing: DSSpacing.sm.value) {
+            VStack(alignment: .leading, spacing: DSSpacing.medium.value) {
                 DSText("Types", style: .title)
 
                 // Pokémon tem no máximo 2 tipos, então HStack é perfeito
-                HStack(spacing: DSSpacing.sm.value) {
+                HStack(spacing: DSSpacing.medium.value) {
                     ForEach(types) { type in
                         DSPillView(
                             type.displayName,
@@ -141,7 +141,7 @@ struct PokemonDetailsView: View {
     // MARK: - Error
 
     private func makeErrorView() -> some View {
-        VStack(spacing: DSSpacing.md.value) {
+        VStack(spacing: DSSpacing.large.value) {
             DSText("Something went wrong", style: .title)
 
             Button("Retry") {

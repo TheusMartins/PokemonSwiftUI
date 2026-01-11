@@ -31,7 +31,7 @@ public struct DSPicker<Option: Hashable & Sendable>: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: DSSpacing.xs.value) {
+        VStack(alignment: .leading, spacing: DSSpacing.small.value) {
             if let title {
                 DSText(title, style: .caption, color: .textSecondary)
             }
@@ -39,7 +39,7 @@ public struct DSPicker<Option: Hashable & Sendable>: View {
             Button {
                 isPresented = true
             } label: {
-                HStack(alignment: .center, spacing: DSSpacing.sm.value) {
+                HStack(alignment: .center, spacing: DSSpacing.medium.value) {
                     Image(systemName: "chevron.down")
                         .rotationEffect(.degrees(isPresented ? 180 : 0))
                         .animation(.easeInOut(duration: 0.18), value: isPresented)
@@ -51,8 +51,8 @@ public struct DSPicker<Option: Hashable & Sendable>: View {
                     Spacer()
 
                 }
-                .padding(.vertical, DSSpacing.sm.value)
-                .padding(.horizontal, DSSpacing.md.value)
+                .padding(.vertical, DSSpacing.medium.value)
+                .padding(.horizontal, DSSpacing.large.value)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(title ?? "Picker")
@@ -88,10 +88,10 @@ private struct OptionSheet<Option: Hashable & Sendable>: View {
     let dismiss: () -> Void
 
     var body: some View {
-        VStack(spacing: DSSpacing.md.value) {
+        VStack(spacing: DSSpacing.large.value) {
             if let title {
                 DSText(title, style: .headline)
-                    .padding(.top, DSSpacing.md.value)
+                    .padding(.top, DSSpacing.large.value)
             }
 
             List {
@@ -134,7 +134,7 @@ private struct DSPickerPreviewContent: View {
     @State private var generation: Generation = .gen1
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DSSpacing.lg.value) {
+        VStack(alignment: .leading, spacing: DSSpacing.xLarge.value) {
 
             DSText("DSPicker Showcase", style: .headline)
 
@@ -157,10 +157,10 @@ private struct DSPickerPreviewContent: View {
 
 #Preview("DSPicker – Light") {
     ScrollView {
-        VStack(alignment: .leading, spacing: DSSpacing.lg.value) {
+        VStack(alignment: .leading, spacing: DSSpacing.xLarge.value) {
             DSPickerPreviewContent()
         }
-        .padding(DSSpacing.lg.value)
+        .padding(DSSpacing.xLarge.value)
     }
     .background(DSColorToken.background.color)
     .preferredColorScheme(.light)
@@ -168,10 +168,10 @@ private struct DSPickerPreviewContent: View {
 
 #Preview("DSPicker – Dark") {
     ScrollView {
-        VStack(alignment: .leading, spacing: DSSpacing.lg.value) {
+        VStack(alignment: .leading, spacing: DSSpacing.xLarge.value) {
             DSPickerPreviewContent()
         }
-        .padding(DSSpacing.lg.value)
+        .padding(DSSpacing.xLarge.value)
     }
     .background(DSColorToken.background.color)
     .preferredColorScheme(.dark)

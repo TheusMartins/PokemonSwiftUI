@@ -14,7 +14,7 @@ struct PokemonItemListView: View {
     let pokemonName: String
     
     var body: some View {
-        HStack(alignment: .center, spacing: DSSpacing.md.value) {
+        HStack(alignment: .center, spacing: DSSpacing.large.value) {
             RemoteImageView(
                 url: url,
                 placeholder: { Color.clear },
