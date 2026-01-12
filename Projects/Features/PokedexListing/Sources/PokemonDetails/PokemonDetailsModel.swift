@@ -5,9 +5,7 @@
 //  Created by Matheus Martins on 11/01/26.
 //
 
-import CoreDesignSystem
 import Foundation
-import SwiftUI
 
 struct PokemonDetailsModel: Equatable, Sendable, Decodable {
     let id: Int
@@ -115,31 +113,4 @@ enum PokemonType: String, CaseIterable, Equatable, Sendable, Decodable, Identifi
     var id: String { rawValue }
 
     var displayName: String { rawValue.capitalized }
-
-    var colorToken: DSColorToken {
-        switch self {
-        case .normal: return .pokemonTypeNormal
-        case .fire: return .pokemonTypeFire
-        case .water: return .pokemonTypeWater
-        case .electric: return .pokemonTypeElectric
-        case .grass: return .pokemonTypeGrass
-        case .ice: return .pokemonTypeIce
-        case .fighting: return .pokemonTypeFighting
-        case .poison: return .pokemonTypePoison
-        case .ground: return .pokemonTypeGround
-        case .flying: return .pokemonTypeFlying
-        case .psychic: return .pokemonTypePsychic
-        case .bug: return .pokemonTypeBug
-        case .rock: return .pokemonTypeRock
-        case .ghost: return .pokemonTypeGhost
-        case .dragon: return .pokemonTypeDragon
-        case .dark: return .pokemonTypeDark
-        case .steel: return .pokemonTypeSteel
-        case .fairy: return .pokemonTypeFairy
-        }
-    }
-
-    var secondaryColorToken: DSColorToken {
-        colorToken
-    }
 }

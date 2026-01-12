@@ -26,7 +26,7 @@ struct PokemonListView: View {
                     makeList(pokemons: viewModel.pokemons)
                 }
             case .failed(let errorMessage):
-                DSErrorScreenView {
+                DSErrorScreenView(title: errorMessage) {
                     Task { await viewModel.loadIfNeeded() }
                 }
             }

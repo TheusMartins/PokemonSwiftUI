@@ -28,8 +28,8 @@ struct PokemonDetailsView: View {
             case .loaded:
                 makeContent()
 
-            case .failed:
-                DSErrorScreenView {
+            case .failed(let errorMessage):
+                DSErrorScreenView(title: errorMessage) {
                     Task { await viewModel.loadIfNeeded() }
                 }
             }
@@ -80,7 +80,7 @@ struct PokemonDetailsView: View {
                     ForEach(types) { type in
                         DSPillView(
                             type.displayName,
-                            backgroundToken: type.colorToken,
+                            backgroundToken: PokemonDetailsHelpers.typeColorToken(type),
                             foregroundToken: .brandPrimaryOn // ou .textPrimary dependendo do contraste
                         )
                     }
@@ -101,8 +101,8 @@ struct PokemonDetailsView: View {
                     id: kind.rawValue,
                     title: kind.displayName,
                     value: value,
-                    progress: normalizedStat(value),
-                    barToken: statBarToken(value)
+                    progress: PokemonDetailsHelpers.normalizedStat(value),
+                    barToken: PokemonDetailsHelpers.statBarToken(value)
                 )
             }
 
@@ -110,26 +110,6 @@ struct PokemonDetailsView: View {
                 title: "Base stats",
                 rows: rows
             )
-        }
-    }
-
-    // MARK: - Helpers
-
-    private func normalizedStat(_ value: Int) -> CGFloat {
-        let maxValue: CGFloat = 200
-        return min(max(CGFloat(value) / maxValue, 0), 1)
-    }
-
-    private func statBarToken(_ value: Int) -> DSColorToken {
-        switch value {
-        case ..<60:
-            return .danger
-        case 60..<100:
-            return .pokemonYellow
-        case 100..<145:
-            return .pokemonGreen
-        default:
-            return .pokemonTeal
         }
     }
 }
