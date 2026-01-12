@@ -11,10 +11,12 @@ import CorePersistence
 import CoreRemoteImage
 
 struct PokemonTeamMemberView: View {
-    
+
     @StateObject private var viewModel: PokemonTeamMemberViewModel
     private let onDelete: @Sendable (Int) -> Void
-    
+
+    @State private var isShowingDeleteConfirmation: Bool = false
+
     init(
         member: TeamPokemon,
         onDelete: @escaping @Sendable (Int) -> Void
@@ -22,13 +24,13 @@ struct PokemonTeamMemberView: View {
         _viewModel = StateObject(wrappedValue: PokemonTeamMemberViewModel(member: member))
         self.onDelete = onDelete
     }
-    
+
     var body: some View {
         HStack(alignment: .center, spacing: DSSpacing.medium.value) {
-            
+
             VStack {
                 DSText(viewModel.name.capitalized, style: .title, color: .textPrimary)
-                
+
                 HStack(spacing: DSSpacing.small.value) {
                     ForEach(viewModel.types.prefix(2)) { type in
                         DSPillView(
@@ -39,7 +41,7 @@ struct PokemonTeamMemberView: View {
                         )
                     }
                 }
-                
+
                 RemoteImageView(url: viewModel.spriteURL, contentMode: .fit) {
                     EmptyView()
                 } loading: {
@@ -51,11 +53,9 @@ struct PokemonTeamMemberView: View {
                     width: DSIconSize.jumbo.value,
                     height: DSIconSize.jumbo.value
                 )
-                
 
-                
                 Button {
-                    onDelete(viewModel.id)
+                    isShowingDeleteConfirmation = true
                 } label: {
                     HStack {
                         Image(systemName: "trash")
@@ -63,13 +63,25 @@ struct PokemonTeamMemberView: View {
                             .foregroundStyle(DSColorToken.textSecondary.color)
                             .padding(DSSpacing.small.value)
                             .background(DSColorToken.background.color.opacity(0.3))
-                            .clipShape(RoundedRectangle(cornerRadius: DSRadius.medium.value, style: .continuous))
+                            .clipShape(
+                                RoundedRectangle(
+                                    cornerRadius: DSRadius.medium.value,
+                                    style: .continuous
+                                )
+                            )
                     }
-
                 }
                 .buttonStyle(.plain)
+                .alert("Remove Pokémon?", isPresented: $isShowingDeleteConfirmation) {
+                    Button("Cancel", role: .cancel) { }
+                    Button("Remove", role: .destructive) {
+                        onDelete(viewModel.id)
+                    }
+                } message: {
+                    Text("This will remove \(viewModel.name.capitalized) from your team.")
+                }
             }
-            
+
             DSStatsCardView(
                 title: "Stats",
                 rows: viewModel.statsRows

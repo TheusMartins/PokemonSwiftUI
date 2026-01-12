@@ -2,7 +2,7 @@
 //  PersistenceDirectory.swift
 //  CorePersistence
 //
-//  Created by Matheus Martins on 09/01/26.
+//  Created by Matheus Martins on 12/01/26.
 //
 
 import Foundation
@@ -12,16 +12,25 @@ public enum PersistenceDirectory: Sendable {
     case documents
 
     public func url(using fileManager: FileManager = .default) throws -> URL {
-        let search: FileManager.SearchPathDirectory
+        let searchDirectory: FileManager.SearchPathDirectory
+
         switch self {
-        case .caches: search = .cachesDirectory
-        case .documents: search = .documentDirectory
+        case .caches:
+            searchDirectory = .cachesDirectory
+        case .documents:
+            searchDirectory = .documentDirectory
         }
 
-        guard let baseURL = fileManager.urls(for: search, in: .userDomainMask).first else {
+        guard let baseURL = fileManager
+            .urls(for: searchDirectory, in: .userDomainMask)
+            .first
+        else {
             throw PersistenceError.unableToResolveDirectory
         }
 
-        return baseURL.appendingPathComponent("CorePersistence", isDirectory: true)
+        return baseURL.appendingPathComponent(
+            "CorePersistence",
+            isDirectory: true
+        )
     }
 }

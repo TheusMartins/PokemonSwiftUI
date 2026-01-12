@@ -2,13 +2,11 @@
 //  FileManagerFilePersistor.swift
 //  CorePersistence
 //
-//  Created by Matheus Martins on 09/01/26.
+//  Created by Matheus Martins on 12/01/26.
 //
 
 import Foundation
 
-/// Concrete filesystem implementation.
-/// As an actor, it is safe to hold non-Sendable types like FileManager/URL internally.
 public actor FileManagerFilePersistor: FilePersisting {
     private let fileManager: FileManager
 
@@ -16,7 +14,7 @@ public actor FileManagerFilePersistor: FilePersisting {
         self.fileManager = fileManager
     }
 
-    public func contents(at url: URL) async throws -> Data? {
+    public func read(from url: URL) async throws -> Data? {
         guard fileManager.fileExists(atPath: url.path) else { return nil }
         return try Data(contentsOf: url)
     }
@@ -25,27 +23,13 @@ public actor FileManagerFilePersistor: FilePersisting {
         try data.write(to: url, options: .atomic)
     }
 
-    public func removeItem(at url: URL) async throws {
+    public func delete(at url: URL) async throws {
         guard fileManager.fileExists(atPath: url.path) else { return }
         try fileManager.removeItem(at: url)
     }
 
     public func createDirectoryIfNeeded(at url: URL) async throws {
-        if !fileManager.fileExists(atPath: url.path) {
-            try fileManager.createDirectory(at: url, withIntermediateDirectories: true)
-        }
-    }
-
-    public func removeContentsOfDirectory(at url: URL) async throws {
-        guard fileManager.fileExists(atPath: url.path) else { return }
-
-        let contents = try fileManager.contentsOfDirectory(
-            at: url,
-            includingPropertiesForKeys: nil
-        )
-
-        for fileURL in contents {
-            try await removeItem(at: fileURL)
-        }
+        guard !fileManager.fileExists(atPath: url.path) else { return }
+        try fileManager.createDirectory(at: url, withIntermediateDirectories: true)
     }
 }

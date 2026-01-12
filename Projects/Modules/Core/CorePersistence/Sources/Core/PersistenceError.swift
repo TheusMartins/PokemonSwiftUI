@@ -2,7 +2,7 @@
 //  PersistenceError.swift
 //  CorePersistence
 //
-//  Created by Matheus Martins on 09/01/26.
+//  Created by Matheus Martins on 12/01/26.
 //
 
 import Foundation
@@ -10,4 +10,5 @@ import Foundation
 public enum PersistenceError: Error, Sendable {
     case unableToResolveDirectory
     case unableToEncode(Error)
+    case unableToDecode(Error)
 }

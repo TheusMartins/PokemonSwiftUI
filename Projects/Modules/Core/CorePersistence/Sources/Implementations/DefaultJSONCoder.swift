@@ -1,13 +1,14 @@
 //
-//  JSONCoder.swift
+//  DefaultJSONCoder.swift
 //  CorePersistence
 //
-//  Created by Matheus Martins on 09/01/26.
+//  Created by Matheus Martins on 12/01/26.
 //
+
 
 import Foundation
 
-public struct JSONCoder: JSONCoding {
+public struct DefaultJSONCoder: JSONCoding {
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
 
@@ -23,7 +24,7 @@ public struct JSONCoder: JSONCoding {
         do {
             return try encoder.encode(value)
         } catch {
-            throw PersistenceError.unableToResolveDirectory
+            throw PersistenceError.unableToEncode(error)
         }
     }
 
@@ -31,7 +32,7 @@ public struct JSONCoder: JSONCoding {
         do {
             return try decoder.decode(type, from: data)
         } catch {
-            throw PersistenceError.unableToEncode(error)
+            throw PersistenceError.unableToDecode(error)
         }
     }
 }
