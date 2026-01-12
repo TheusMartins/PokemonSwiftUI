@@ -20,7 +20,7 @@ struct PokemonDetailsView: View {
         Group {
             switch viewModel.state {
             case .idle:
-                EmptyView()
+                DSLoadingView(size: DSIconSize.huge.value)
 
             case .loading:
                 DSLoadingView(size: DSIconSize.huge.value)
@@ -29,7 +29,9 @@ struct PokemonDetailsView: View {
                 makeContent()
 
             case .failed:
-                makeErrorView()
+                DSErrorScreenView {
+                    Task { await viewModel.loadIfNeeded() }
+                }
             }
         }
         .background(DSColorToken.background.color)
@@ -109,20 +111,6 @@ struct PokemonDetailsView: View {
                 rows: rows
             )
         }
-    }
-
-    // MARK: - Error
-
-    private func makeErrorView() -> some View {
-        VStack(spacing: DSSpacing.large.value) {
-            DSText("Something went wrong", style: .title)
-
-            Button("Retry") {
-                Task { await viewModel.load() }
-            }
-            .buttonStyle(.borderedProminent)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Helpers
