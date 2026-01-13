@@ -150,6 +150,18 @@ final class PokemonDetailsViewModel: ObservableObject {
             )
         }
     }
+    
+    // MARK: - Team refresh
+
+    func refreshTeamStatus() async {
+        guard let model else { return }
+        do {
+            isInTeam = try await teamStore.contains(memberId: model.id)
+        } catch {
+            // Silent failure: we don't want to break the details screen UX
+            // If you prefer, you can set a toast/error here.
+        }
+    }
 
     func dismissToast() {
         withAnimation(.snappy) {

@@ -22,20 +22,13 @@ struct PokemonDetailsView: View {
                 .background(DSColorToken.background.color)
                 .navigationTitle(viewModel.model?.name.capitalized ?? "Details")
                 .navigationBarTitleDisplayMode(.inline)
-                .task { await viewModel.loadIfNeeded() }
-                .alert("Team", isPresented: Binding(
-                    get: { viewModel.teamErrorMessage != nil },
-                    set: { if !$0 { viewModel.teamErrorMessage = nil } }
-                )) {
-                    Button("OK") { viewModel.teamErrorMessage = nil }
-                } message: {
-                    Text(viewModel.teamErrorMessage ?? "")
+                .task {
+                    await viewModel.loadIfNeeded()
+                    await viewModel.refreshTeamStatus()
                 }
                 .alert("Team", isPresented: $viewModel.isConfirmPresented) {
                     Button(viewModel.isInTeam ? "Remove" : "Add", role: viewModel.isInTeam ? .destructive : nil) {
-                        Task { @MainActor in
-                            await viewModel.confirmTeamAction()
-                        }
+                        Task { await viewModel.confirmTeamAction() }
                     }
 
                     Button("Cancel", role: .cancel) { }

@@ -28,9 +28,11 @@ struct PokemonTeamView: View {
         .background(DSColorToken.background.color)
         .navigationTitle("My Team")
         .navigationBarTitleDisplayMode(.large)
-        .navigationBarTitleDisplayMode(.inline)
         .task {
-            await viewModel.loadIfNeeded()
+            await viewModel.load()
+        }
+        .refreshable {
+            await viewModel.load()
         }
     }
 
