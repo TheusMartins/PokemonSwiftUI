@@ -17,30 +17,51 @@ struct PokemonDetailsView: View {
     }
 
     var body: some View {
-        Group {
-            switch viewModel.state {
-            case .idle, .loading:
-                DSLoadingView(size: DSIconSize.huge.value)
-
-            case .loaded:
-                makeContent()
-
-            case .failed(let errorMessage):
-                DSErrorScreenView(title: errorMessage) {
-                    Task { await viewModel.loadIfNeeded() }
+        ZStack(alignment: .top) {
+            contentRoot
+                .background(DSColorToken.background.color)
+                .navigationTitle(viewModel.model?.name.capitalized ?? "Details")
+                .navigationBarTitleDisplayMode(.inline)
+                .task { await viewModel.loadIfNeeded() }
+                .alert("Team", isPresented: Binding(
+                    get: { viewModel.teamErrorMessage != nil },
+                    set: { if !$0 { viewModel.teamErrorMessage = nil } }
+                )) {
+                    Button("OK") { viewModel.teamErrorMessage = nil }
+                } message: {
+                    Text(viewModel.teamErrorMessage ?? "")
                 }
+                .alert("Team", isPresented: $viewModel.isConfirmPresented) {
+                    Button(viewModel.isInTeam ? "Remove" : "Add", role: viewModel.isInTeam ? .destructive : nil) {
+                        Task { @MainActor in
+                            await viewModel.confirmTeamAction()
+                        }
+                    }
+
+                    Button("Cancel", role: .cancel) { }
+                } message: {
+                    Text(confirmMessage)
+                }
+
+            toastOverlay
+        }
+    }
+
+    // MARK: - Root Content
+
+    @ViewBuilder
+    private var contentRoot: some View {
+        switch viewModel.state {
+        case .idle, .loading:
+            DSLoadingView(size: DSIconSize.huge.value)
+
+        case .loaded:
+            makeContent()
+
+        case .failed(let errorMessage):
+            DSErrorScreenView(title: errorMessage) {
+                Task { await viewModel.loadIfNeeded() }
             }
-        }
-        .background(DSColorToken.background.color)
-        .navigationTitle(viewModel.model?.name.capitalized ?? "Details")
-        .navigationBarTitleDisplayMode(.inline)
-        .task {
-            await viewModel.loadIfNeeded()
-        }
-        .alert("Team", isPresented: .constant(viewModel.teamErrorMessage != nil)) {
-            Button("OK") { viewModel.teamErrorMessage = nil }
-        } message: {
-            Text(viewModel.teamErrorMessage ?? "")
         }
     }
 
@@ -78,13 +99,12 @@ struct PokemonDetailsView: View {
             VStack(alignment: .leading, spacing: DSSpacing.medium.value) {
                 DSText("Types", style: .title)
 
-                // Pokémon tem no máximo 2 tipos, então HStack é perfeito
                 HStack(spacing: DSSpacing.medium.value) {
                     ForEach(types) { type in
                         DSPillView(
                             type.displayName,
                             backgroundToken: PokemonDetailsHelpers.typeColorToken(type),
-                            foregroundToken: .brandPrimaryOn // ou .textPrimary dependendo do contraste
+                            foregroundToken: .brandPrimaryOn
                         )
                     }
                 }
@@ -115,7 +135,9 @@ struct PokemonDetailsView: View {
             )
         }
     }
-    
+
+    // MARK: - Team Action
+
     @ViewBuilder
     private func teamActionButton() -> some View {
         DSButton(
@@ -123,8 +145,38 @@ struct PokemonDetailsView: View {
             style: viewModel.isInTeam ? .secondary : .primary,
             isLoading: viewModel.isTeamActionInProgress
         ) {
-            Task { await viewModel.toggleTeamMembership() }
+            Task { @MainActor in
+                viewModel.didTapTeamAction()
+            }
         }
-        .disabled(viewModel.model == nil)
+        .disabled(viewModel.model == nil || viewModel.isTeamActionInProgress)
+    }
+
+    private var confirmMessage: String {
+        guard let name = viewModel.model?.name.capitalized else { return "" }
+        return viewModel.isInTeam
+            ? "Remove \(name) from your team?"
+            : "Add \(name) to your team?"
+    }
+
+    // MARK: - Toast
+
+    @ViewBuilder
+    private var toastOverlay: some View {
+        if let toast = viewModel.feedbackToast {
+            DSFeedbackToast(
+                title: toast.title,
+                message: toast.message,
+                style: toast.style,
+                onDismiss: {
+                    Task { @MainActor in
+                        viewModel.dismissToast()
+                    }
+                }
+            )
+            .padding(.horizontal, DSSpacing.xLarge.value)
+            .padding(.top, DSSpacing.large.value)
+            .zIndex(1)
+        }
     }
 }
