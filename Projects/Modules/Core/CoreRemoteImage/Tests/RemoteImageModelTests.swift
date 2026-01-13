@@ -17,7 +17,7 @@ final class RemoteImageModelTests: XCTestCase {
         let sut = RemoteImageModel(loader: ImageLoaderMock())
 
         // When
-        sut.load(url: nil)
+        await sut.load(url: nil)
 
         // Then
         XCTAssertEqual(sut.state, .idle)
@@ -32,7 +32,7 @@ final class RemoteImageModelTests: XCTestCase {
         let url = URL(string: "https://example.com/img.png")!
 
         // When
-        sut.load(url: url)
+        await sut.load(url: url)
 
         // Then
         await assertEventually {
@@ -52,7 +52,7 @@ final class RemoteImageModelTests: XCTestCase {
         let url = URL(string: "https://example.com/img.png")!
 
         // When
-        sut.load(url: url)
+        await sut.load(url: url)
 
         // Then
         await assertEventually {
