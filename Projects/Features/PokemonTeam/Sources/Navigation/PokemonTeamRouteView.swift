@@ -19,7 +19,7 @@ public struct PokemonTeamRouteView: View {
     public var body: some View {
         switch route {
         case .team:
-            PokemonTeamView(viewModel: .init(store: PreviewPokemonTeamStore()))
+            PokemonTeamViewContainer()
         }
     }
 }

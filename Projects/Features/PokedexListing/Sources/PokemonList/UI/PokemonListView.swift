@@ -49,7 +49,7 @@ struct PokemonListView: View {
                             Task { await viewModel.changeGeneration(to: newValue) }
                         }
                     ),
-                    label: { $0.name }
+                    label: { $0.name.capitalized }
                 )
                 .background(DSColorToken.background.color)
             } else {
@@ -63,7 +63,7 @@ struct PokemonListView: View {
             Button {
                 onPokemonSelected(pokemon.name)
             } label: {
-                PokemonItemListView(url: pokemon.imageURL ?? pokemon.url, pokemonName: pokemon.name)
+                PokemonItemListView(url: pokemon.imageURL ?? pokemon.url, pokemonName: pokemon.name.capitalized)
             }
             .buttonStyle(.plain)
             .listRowBackground(DSColorToken.background.color)

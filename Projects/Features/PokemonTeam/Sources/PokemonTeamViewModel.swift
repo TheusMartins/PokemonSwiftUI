@@ -21,10 +21,17 @@ final class PokemonTeamViewModel: ObservableObject {
     @Published private(set) var members: [TeamPokemon] = []
     @Published var state: State = .idle
 
-    private let store: PokemonTeamStoring
+    private let store: TeamPokemonStore
 
-    init(store: PokemonTeamStoring) {
+    init(store: TeamPokemonStore) {
         self.store = store
+    }
+    
+    // MARK: - Factory default (async)
+
+    static func makeDefault() async throws -> PokemonTeamViewModel {
+        let store = try await TeamPokemonStoreImplementation.makeDefault()
+        return PokemonTeamViewModel(store: store)
     }
 
     func loadIfNeeded() async {

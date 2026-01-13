@@ -90,8 +90,7 @@ struct PokemonTeamView: View {
 
 // MARK: - Preview Store
 
-final class PreviewPokemonTeamStore: PokemonTeamStoring {
-
+final class PreviewPokemonTeamStore: TeamPokemonStore {
     func fetchTeam() async throws -> [TeamPokemon] {
         [
             .init(
@@ -187,4 +186,8 @@ final class PreviewPokemonTeamStore: PokemonTeamStoring {
     }
 
     func delete(memberId: Int) async throws { }
+    
+    func save(_ pokemon: CorePersistence.TeamPokemon) async throws { }
+    
+    func contains(memberId: Int) async throws -> Bool { false }
 }

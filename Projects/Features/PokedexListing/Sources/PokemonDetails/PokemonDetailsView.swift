@@ -12,17 +12,14 @@ import CoreRemoteImage
 struct PokemonDetailsView: View {
     @StateObject private var viewModel: PokemonDetailsViewModel
 
-    init(pokemonName: String) {
-        _viewModel = StateObject(wrappedValue: PokemonDetailsViewModel(pokemonName: pokemonName))
+    init(viewModel: PokemonDetailsViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {
         Group {
             switch viewModel.state {
-            case .idle:
-                DSLoadingView(size: DSIconSize.huge.value)
-
-            case .loading:
+            case .idle, .loading:
                 DSLoadingView(size: DSIconSize.huge.value)
 
             case .loaded:
@@ -40,6 +37,11 @@ struct PokemonDetailsView: View {
         .task {
             await viewModel.loadIfNeeded()
         }
+        .alert("Team", isPresented: .constant(viewModel.teamErrorMessage != nil)) {
+            Button("OK") { viewModel.teamErrorMessage = nil }
+        } message: {
+            Text(viewModel.teamErrorMessage ?? "")
+        }
     }
 
     // MARK: - Content
@@ -50,6 +52,7 @@ struct PokemonDetailsView: View {
                 makeSpritesRow()
                 makeTypesSection()
                 makeStatsSection()
+                teamActionButton()
             }
             .padding(.horizontal, DSSpacing.xLarge.value)
             .padding(.top, DSSpacing.large.value)
@@ -111,5 +114,17 @@ struct PokemonDetailsView: View {
                 rows: rows
             )
         }
+    }
+    
+    @ViewBuilder
+    private func teamActionButton() -> some View {
+        DSButton(
+            title: viewModel.isInTeam ? "Remove from Team" : "Add to Team",
+            style: viewModel.isInTeam ? .secondary : .primary,
+            isLoading: viewModel.isTeamActionInProgress
+        ) {
+            Task { await viewModel.toggleTeamMembership() }
+        }
+        .disabled(viewModel.model == nil)
     }
 }

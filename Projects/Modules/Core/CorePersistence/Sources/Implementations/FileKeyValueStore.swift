@@ -10,6 +10,11 @@ import Foundation
 public actor FileKeyValueStore: KeyValueStoring {
     private let directoryURL: URL
     private let persistor: FilePersisting
+    
+    // Default initializer for the app: no external dependencies required.
+    public init() async throws {
+        try await self.init(directory: .default)
+    }
 
     public init(
         directory: PersistenceDirectory,

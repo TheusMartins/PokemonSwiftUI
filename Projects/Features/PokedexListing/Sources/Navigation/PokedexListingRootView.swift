@@ -24,7 +24,7 @@ public struct PokedexListingRouteView: View {
             .navigationDestination(for: PokedexListingRoute.self) { route in
                 switch route {
                 case let .pokemonDetails(name):
-                    PokemonDetailsView(pokemonName: name)
+                    PokemonDetailsRouteView(pokemonName: name)
                 }
             }
         }
