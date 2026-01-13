@@ -5,7 +5,7 @@ import PokemonTeam
 struct PokemonTeamDemoApp: App {
     var body: some Scene {
         WindowGroup {
-            PokemonTeamView()
+            PokemonTeamRouteView()
         }
     }
 }

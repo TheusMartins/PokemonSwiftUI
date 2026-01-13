@@ -90,7 +90,7 @@ struct PokemonTeamView: View {
 
 // MARK: - Preview Store
 
-private final class PreviewPokemonTeamStore: PokemonTeamStoring {
+final class PreviewPokemonTeamStore: PokemonTeamStoring {
 
     func fetchTeam() async throws -> [TeamPokemon] {
         [
