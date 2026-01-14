@@ -13,10 +13,10 @@ let project = Project(
             sources: ["Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
-                .project(target: "CoreNetworking", path: "../../Modules/Core/CoreNetworking"),
-                .project(target: "CorePersistence", path: "../../Modules/Core/CorePersistence"),
-                .project(target: "CoreDesignSystem", path: "../../Modules/Core/CoreDesignSystem"),
-                .project(target: "CoreRemoteImage", path: "../../Modules/Core/CoreRemoteImage")
+                .project(target: "CoreNetworking", path: "../../Modules/CoreNetworking"),
+                .project(target: "CorePersistence", path: "../../Modules/CorePersistence"),
+                .project(target: "CoreDesignSystem", path: "../../Modules/CoreDesignSystem"),
+                .project(target: "CoreRemoteImage", path: "../../Modules/CoreRemoteImage")
             ]
         ),
         .target(
