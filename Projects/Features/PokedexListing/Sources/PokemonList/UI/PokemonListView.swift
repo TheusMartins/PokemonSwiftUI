@@ -10,21 +10,32 @@ import SwiftUI
 import CoreDesignSystem
 
 struct PokemonListView: View {
-    @StateObject private var viewModel: PokemonListViewModel = .init()
+    @ObservedObject var viewModel: PokemonListViewModel
     let onPokemonSelected: (String) -> Void
-    
+    @Binding var searchText: String
+    let usesTabSearch: Bool
+
     public var body: some View {
         Group {
             switch viewModel.state {
-            case .idle:
+            case .idle, .loading:
                 DSLoadingView(size: DSIconSize.huge.value)
-            case .loading:
-                DSLoadingView(size: DSIconSize.huge.value)
+
             case .loaded:
-                VStack() {
+                VStack {
                     makePicker(generations: viewModel.generations)
-                    makeList(pokemons: viewModel.pokemons)
+                    
+                    if !usesTabSearch {
+                        DSSearchBar(
+                            text: $searchText,
+                            placeholder: "Search Pokémon"
+                        )
+                        .padding(.horizontal, DSSpacing.xLarge.value)
+                    }
+                    
+                    makeList(pokemons: viewModel.filteredPokemons)
                 }
+
             case .failed(let errorMessage):
                 DSErrorScreenView(title: errorMessage) {
                     Task { await viewModel.loadIfNeeded() }
@@ -35,8 +46,11 @@ struct PokemonListView: View {
         .task {
             await viewModel.loadIfNeeded()
         }
+        .onChange(of: searchText) { _, newValue in
+            viewModel.searchText = newValue
+        }
     }
-    
+
     private func makePicker(generations: [GenerationModel]) -> some View {
         Group {
             if let selected = viewModel.selectedGeneration {
@@ -57,13 +71,16 @@ struct PokemonListView: View {
             }
         }
     }
-    
+
     private func makeList(pokemons: [PokemonModel]) -> some View {
         List(pokemons) { pokemon in
             Button {
                 onPokemonSelected(pokemon.name)
             } label: {
-                PokemonItemListView(url: pokemon.imageURL ?? pokemon.url, pokemonName: pokemon.name.capitalized)
+                PokemonItemListView(
+                    url: pokemon.imageURL ?? pokemon.url,
+                    pokemonName: pokemon.name.capitalized
+                )
             }
             .buttonStyle(.plain)
             .listRowBackground(DSColorToken.background.color)

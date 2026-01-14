@@ -102,12 +102,14 @@ final class PokemonListViewModelTests: XCTestCase {
             .init(name: "ivysaur", url: URL(string: "https://google.com")!)
         ]))
 
-        let sut = makeSUT(repository: spy)
+        let context = PokedexListingSearchContext()
+        let sut = makeSUT(repository: spy, searchContext: context)
 
         // When
         await sut.load()
 
         // Then
+        XCTAssertEqual(context.selectedGenerationId, "generation-i")
         XCTAssertEqual(spy.getGenerationsCallsCount, 1)
         XCTAssertEqual(spy.getPokemonCalls, ["generation-i"])
 
@@ -143,12 +145,14 @@ final class PokemonListViewModelTests: XCTestCase {
             .init(name: "generation-i", url: URL(string: "https://google.com")!)
         ]))
         spy.stubbedPokemonResult = .failure(anyError())
-        let sut = makeSUT(repository: spy)
+        let context = PokedexListingSearchContext()
+        let sut = makeSUT(repository: spy, searchContext: context)
 
         // When
         await sut.load()
 
         // Then
+        XCTAssertEqual(context.selectedGenerationId, "generation-i")
         XCTAssertEqual(spy.getGenerationsCallsCount, 1)
         XCTAssertEqual(spy.getPokemonCalls, ["generation-i"])
 
@@ -184,12 +188,14 @@ final class PokemonListViewModelTests: XCTestCase {
             .init(name: "charmander", url: URL(string: "https://google.com")!)
         ]))
 
-        let sut = makeSUT(repository: spy)
-
+        let context = PokedexListingSearchContext()
+        let sut = makeSUT(repository: spy, searchContext: context)
+        
         // When
         await sut.changeGeneration(to: .init(name: "generation-i", url: URL(string: "https://google.com")!))
 
         // Then
+        XCTAssertEqual(context.selectedGenerationId, "generation-i")
         XCTAssertEqual(sut.selectedGeneration?.name, "generation-i")
         XCTAssertEqual(spy.getPokemonCalls, ["generation-i"])
 
@@ -242,13 +248,232 @@ final class PokemonListViewModelTests: XCTestCase {
 
         assertState(sut.state, is: .failed(message: "Invalid generation id"))
     }
+    
+    func test_filteredPokemons_whenSearchTextIsEmpty_returnsAllPokemons() async {
+        // Given
+        let spy = PokemonListRepositorySpy()
+        spy.stubbedGenerationsResult = .success(makeGenerations([
+            .init(name: "generation-i", url: URL(string: "https://google.com")!)
+        ]))
+        spy.stubbedPokemonResult = .success(makePokemons([
+            .init(name: "bulbasaur", url: URL(string: "https://google.com")!),
+            .init(name: "ivysaur", url: URL(string: "https://google.com")!)
+        ]))
+
+        let sut = makeSUT(repository: spy)
+        await sut.load()
+
+        // When
+        sut.searchText = ""
+
+        // Then
+        XCTAssertEqual(sut.filteredPokemons.map(\.name), ["bulbasaur", "ivysaur"])
+    }
+
+    func test_filteredPokemons_whenSearchTextHasLeadingOrTrailingSpaces_trimsAndFilters() async {
+        // Given
+        let spy = PokemonListRepositorySpy()
+        spy.stubbedGenerationsResult = .success(makeGenerations([
+            .init(name: "generation-i", url: URL(string: "https://google.com")!)
+        ]))
+        spy.stubbedPokemonResult = .success(makePokemons([
+            .init(name: "bulbasaur", url: URL(string: "https://google.com")!),
+            .init(name: "ivysaur", url: URL(string: "https://google.com")!)
+        ]))
+
+        let sut = makeSUT(repository: spy)
+        await sut.load()
+
+        // When
+        sut.searchText = "  bulba  "
+
+        // Then
+        XCTAssertEqual(sut.filteredPokemons.map(\.name), ["bulbasaur"])
+    }
+
+    func test_filteredPokemons_whenSearchTextMatchesCaseInsensitive_returnsMatches() async {
+        // Given
+        let spy = PokemonListRepositorySpy()
+        spy.stubbedGenerationsResult = .success(makeGenerations([
+            .init(name: "generation-i", url: URL(string: "https://google.com")!)
+        ]))
+        spy.stubbedPokemonResult = .success(makePokemons([
+            .init(name: "bulbasaur", url: URL(string: "https://google.com")!),
+            .init(name: "ivysaur", url: URL(string: "https://google.com")!),
+            .init(name: "venusaur", url: URL(string: "https://google.com")!)
+        ]))
+
+        let sut = makeSUT(repository: spy)
+        await sut.load()
+
+        // When
+        sut.searchText = "SAUR"
+
+        // Then
+        XCTAssertEqual(sut.filteredPokemons.map(\.name), ["bulbasaur", "ivysaur", "venusaur"])
+    }
+
+    func test_filteredPokemons_whenNoMatches_returnsEmpty() async {
+        // Given
+        let spy = PokemonListRepositorySpy()
+        spy.stubbedGenerationsResult = .success(makeGenerations([
+            .init(name: "generation-i", url: URL(string: "https://google.com")!)
+        ]))
+        spy.stubbedPokemonResult = .success(makePokemons([
+            .init(name: "bulbasaur", url: URL(string: "https://google.com")!),
+            .init(name: "ivysaur", url: URL(string: "https://google.com")!)
+        ]))
+
+        let sut = makeSUT(repository: spy)
+        await sut.load()
+
+        // When
+        sut.searchText = "pikachu"
+
+        // Then
+        XCTAssertTrue(sut.filteredPokemons.isEmpty)
+    }
+    
+    func test_load_givenContextHasGenerationId_matchingGeneration_selectsFromContext_andDoesNotOverrideContext() async {
+        // Given
+        let spy = PokemonListRepositorySpy()
+        spy.stubbedGenerationsResult = .success(makeGenerations([
+            .init(name: "generation-i", url: URL(string: "https://google.com")!),
+            .init(name: "generation-iii", url: URL(string: "https://google.com")!)
+        ]))
+        spy.stubbedPokemonResult = .success(makePokemons([
+            .init(name: "treecko", url: URL(string: "https://google.com")!)
+        ]))
+
+        let context = PokedexListingSearchContext()
+        context.selectedGenerationId = "generation-iii"
+
+        let sut = makeSUT(repository: spy, searchContext: context)
+
+        // When
+        await sut.load()
+
+        // Then
+        XCTAssertEqual(sut.selectedGeneration?.name, "generation-iii")
+        XCTAssertEqual(spy.getPokemonCalls, ["generation-iii"])
+        XCTAssertEqual(context.selectedGenerationId, "generation-iii") // should stay
+        assertState(sut.state, is: .loaded)
+    }
+
+    func test_load_givenContextHasGenerationId_notFound_fallsBackToFirst_andUpdatesContext() async {
+        // Given
+        let spy = PokemonListRepositorySpy()
+        spy.stubbedGenerationsResult = .success(makeGenerations([
+            .init(name: "generation-i", url: URL(string: "https://google.com")!),
+            .init(name: "generation-ii", url: URL(string: "https://google.com")!)
+        ]))
+        spy.stubbedPokemonResult = .success(makePokemons([
+            .init(name: "bulbasaur", url: URL(string: "https://google.com")!)
+        ]))
+
+        let context = PokedexListingSearchContext()
+        context.selectedGenerationId = "generation-999"
+
+        let sut = makeSUT(repository: spy, searchContext: context)
+
+        // When
+        await sut.load()
+
+        // Then
+        XCTAssertEqual(sut.selectedGeneration?.name, "generation-i")
+        XCTAssertEqual(spy.getPokemonCalls, ["generation-i"])
+        XCTAssertEqual(context.selectedGenerationId, "generation-i") // overwritten ✅
+        assertState(sut.state, is: .loaded)
+    }
+    
+    func test_applyGenerationFromContextIfNeeded_givenStateIsNotLoaded_doesNothing() async {
+        // Given
+        let spy = PokemonListRepositorySpy()
+        let context = PokedexListingSearchContext()
+        context.selectedGenerationId = "generation-ii"
+        let sut = makeSUT(repository: spy, searchContext: context)
+
+        sut.state = .loading
+
+        // When
+        await sut.applyGenerationFromContextIfNeeded()
+
+        // Then
+        XCTAssertTrue(spy.getPokemonCalls.isEmpty)
+        assertState(sut.state, is: .loading)
+    }
+
+    func test_applyGenerationFromContextIfNeeded_givenContextIdIsNil_doesNothing() async {
+        // Given
+        let spy = PokemonListRepositorySpy()
+
+        // Context com nil id
+        let context = PokedexListingSearchContext()
+        context.selectedGenerationId = nil
+
+        // load() precisa de stubs pra setar generations/selected/pokemons
+        spy.stubbedGenerationsResult = .success(makeGenerations([
+            .init(name: "generation-i", url: URL(string: "https://google.com")!)
+        ]))
+        spy.stubbedPokemonResult = .success(makePokemons([
+            .init(name: "bulbasaur", url: URL(string: "https://google.com")!)
+        ]))
+
+        let sut = makeSUT(repository: spy, searchContext: context)
+        await sut.load()
+
+        // sanity
+        XCTAssertEqual(sut.state, .loaded)
+        XCTAssertEqual(sut.selectedGeneration?.name, "generation-i")
+        XCTAssertEqual(spy.getPokemonCalls, ["generation-i"])
+        spy.resetSpyPokemonCalls()
+
+        // When
+        await sut.applyGenerationFromContextIfNeeded()
+
+        XCTAssertTrue(spy.getPokemonCalls.isEmpty)
+        XCTAssertEqual(sut.selectedGeneration?.name, "generation-i")
+    }
+
+    func test_applyGenerationFromContextIfNeeded_givenDifferentContextId_changesGeneration() async {
+        // Given
+        let spy = PokemonListRepositorySpy()
+        spy.stubbedGenerationsResult = .success(makeGenerations([
+            .init(name: "generation-i", url: URL(string: "https://google.com")!),
+            .init(name: "generation-iii", url: URL(string: "https://google.com")!)
+        ]))
+        spy.stubbedPokemonResult = .success(makePokemons([
+            .init(name: "treecko", url: URL(string: "https://google.com")!)
+        ]))
+
+        let context = PokedexListingSearchContext()
+        let sut = makeSUT(repository: spy, searchContext: context)
+        await sut.load()
+
+        // sanity
+        XCTAssertEqual(sut.selectedGeneration?.name, "generation-i")
+
+        // When
+        context.selectedGenerationId = "generation-iii"
+        await sut.applyGenerationFromContextIfNeeded()
+
+        // Then
+        XCTAssertEqual(sut.selectedGeneration?.name, "generation-iii")
+        XCTAssertEqual(spy.getPokemonCalls, ["generation-i", "generation-iii"])
+        XCTAssertEqual(context.selectedGenerationId, "generation-iii")
+    }
 
     // MARK: - Helpers
 
     private func makeSUT(
-        repository: PokemonListRepository = PokemonListRepositorySpy()
+        repository: PokemonListRepository = PokemonListRepositorySpy(),
+        searchContext: PokedexListingSearchContext? = nil
     ) -> PokemonListViewModel {
-        PokemonListViewModel(repository: repository)
+        let context = searchContext ?? PokedexListingSearchContext()
+        return PokemonListViewModel(
+            repository: repository,
+            searchContext: context
+        )
     }
 
     private func anyError() -> NSError {
@@ -304,5 +529,9 @@ private final class PokemonListRepositorySpy: PokemonListRepository {
     func getPokemon(generationId: String) async throws -> PokemonListModel {
         getPokemonCalls.append(generationId)
         return try stubbedPokemonResult.get()
+    }
+    
+    func resetSpyPokemonCalls() {
+        getPokemonCalls.removeAll()
     }
 }

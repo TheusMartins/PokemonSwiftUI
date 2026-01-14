@@ -36,26 +36,67 @@ struct AppRootView: View {
 }
 
 private struct MainTabsView: View {
-
+    @StateObject private var searchContext = PokedexListingSearchContext()
+    @State private var pokedexSearchText: String = ""
     let teamStore: TeamPokemonStore
 
     var body: some View {
-        TabView {
-            NavigationStack {
-                PokedexListingRouteView()
+        Group {
+            if #available(iOS 26.0, *) {
+                tabsiOS26
+            } else {
+                tabsLegacy
             }
+        }
+    }
+
+    // MARK: - iOS 26+
+
+    @available(iOS 26.0, *)
+    private var tabsiOS26: some View {
+        TabView {
+            Tab("Pokédex", systemImage: "magnifyingglass") {
+                PokedexListingRouteView(
+                    searchText: $pokedexSearchText,
+                    usesTabSearch: true,
+                    searchContext: searchContext
+                )
+            }
+
+            Tab("My Team", systemImage: "person.3.fill") {
+                PokemonTeamRouteView()
+            }
+
+            Tab(role: .search) {
+                PokedexListingRouteView(
+                    searchText: $pokedexSearchText,
+                    usesTabSearch: true,
+                    searchContext: searchContext
+                )
+                .searchable(text: $pokedexSearchText)
+            }
+        }
+    }
+
+    // MARK: - iOS < 26
+
+    private var tabsLegacy: some View {
+        TabView {
+            PokedexListingRouteView(
+                searchText: $pokedexSearchText,
+                usesTabSearch: false,
+                searchContext: searchContext
+            )
             .tabItem {
                 Image(systemName: "magnifyingglass")
                 Text("Pokédex")
             }
 
-            NavigationStack {
-                PokemonTeamRouteView()
-            }
-            .tabItem {
-                Image(systemName: "person.3.fill")
-                Text("My Team")
-            }
+            PokemonTeamRouteView()
+                .tabItem {
+                    Image(systemName: "person.3.fill")
+                    Text("My Team")
+                }
         }
     }
 }

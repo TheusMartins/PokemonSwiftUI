@@ -7,19 +7,34 @@
 
 import SwiftUI
 
-import SwiftUI
-
 public struct PokedexListingRouteView: View {
     @StateObject private var router = PokedexListingRouter()
-    
-    public init() {}
+    @StateObject private var viewModel: PokemonListViewModel
+    @ObservedObject private var searchContext: PokedexListingSearchContext
+
+    @Binding private var searchText: String
+    private let usesTabSearch: Bool
+
+    public init(
+        searchText: Binding<String>,
+        usesTabSearch: Bool,
+        searchContext: PokedexListingSearchContext
+    ) {
+        _searchText = searchText
+        self.usesTabSearch = usesTabSearch
+        _searchContext = ObservedObject(wrappedValue: searchContext)
+        _viewModel = StateObject(wrappedValue: PokemonListViewModel(searchContext: searchContext))
+    }
 
     public var body: some View {
-        NavigationStack(path: $router.path) {
+        NavigationStack(
+            path: Binding(get: { router.path }, set: { router.path = $0 })
+        ) {
             PokemonListView(
-                onPokemonSelected: { name in
-                    router.push(.pokemonDetails(name: name))
-                }
+                viewModel: viewModel,
+                onPokemonSelected: { name in router.push(.pokemonDetails(name: name)) },
+                searchText: $searchText,
+                usesTabSearch: usesTabSearch
             )
             .navigationDestination(for: PokedexListingRoute.self) { route in
                 switch route {
@@ -27,6 +42,10 @@ public struct PokedexListingRouteView: View {
                     PokemonDetailsRouteView(pokemonName: name)
                 }
             }
+        }
+        .task { await viewModel.loadIfNeeded() }
+        .task(id: searchContext.selectedGenerationId) {
+            await viewModel.applyGenerationFromContextIfNeeded()
         }
     }
 }
