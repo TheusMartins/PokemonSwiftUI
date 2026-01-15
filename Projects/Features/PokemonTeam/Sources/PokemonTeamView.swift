@@ -4,11 +4,17 @@ import CorePersistence
 
 struct PokemonTeamView: View {
 
+    // MARK: - State
+
     @StateObject private var viewModel: PokemonTeamViewModel
+
+    // MARK: - Initialization
 
     init(viewModel: PokemonTeamViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
+
+    // MARK: - Body
 
     var body: some View {
         Group {
@@ -35,6 +41,8 @@ struct PokemonTeamView: View {
             await viewModel.load()
         }
     }
+    
+    // MARK: - Private views
 
     private var content: some View {
         ScrollView {
@@ -90,9 +98,18 @@ struct PokemonTeamView: View {
     .preferredColorScheme(.dark)
 }
 
+// MARK: - Strings
+
+private extension String {
+    static let navigationTitle = "My Team"
+    static let emptyTitle = "Your team is empty"
+    static let emptyMessage = "Add Pokémon from the listing to see them here."
+}
+
 // MARK: - Preview Store
 
 final class PreviewPokemonTeamStore: TeamPokemonStore {
+
     func fetchTeam() async throws -> [TeamPokemon] {
         [
             .init(
@@ -109,7 +126,6 @@ final class PreviewPokemonTeamStore: TeamPokemonStore {
                     .init(kind: .speed, value: 65)
                 ]
             ),
-
             .init(
                 id: 6,
                 name: "Charizard",
@@ -124,7 +140,6 @@ final class PreviewPokemonTeamStore: TeamPokemonStore {
                     .init(kind: .speed, value: 100)
                 ]
             ),
-
             .init(
                 id: 9,
                 name: "Blastoise",
@@ -139,7 +154,6 @@ final class PreviewPokemonTeamStore: TeamPokemonStore {
                     .init(kind: .speed, value: 78)
                 ]
             ),
-
             .init(
                 id: 25,
                 name: "Pikachu",
@@ -154,7 +168,6 @@ final class PreviewPokemonTeamStore: TeamPokemonStore {
                     .init(kind: .speed, value: 90)
                 ]
             ),
-
             .init(
                 id: 143,
                 name: "Snorlax",
@@ -169,7 +182,6 @@ final class PreviewPokemonTeamStore: TeamPokemonStore {
                     .init(kind: .speed, value: 30)
                 ]
             ),
-
             .init(
                 id: 448,
                 name: "Lucario",
@@ -188,8 +200,8 @@ final class PreviewPokemonTeamStore: TeamPokemonStore {
     }
 
     func delete(memberId: Int) async throws { }
-    
-    func save(_ pokemon: CorePersistence.TeamPokemon) async throws { }
-    
+
+    func save(_ pokemon: TeamPokemon) async throws { }
+
     func contains(memberId: Int) async throws -> Bool { false }
 }

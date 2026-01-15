@@ -12,11 +12,15 @@ import CorePersistence
 @MainActor
 final class PokemonTeamMemberViewModel: ObservableObject, Identifiable {
 
+    // MARK: - Open properties
+
     let id: Int
     let name: String
     let spriteURL: URL?
     let types: [TeamPokemonType]
     let statsRows: [DSStatsCardView.Row]
+
+    // MARK: - Initialization
 
     init(member: TeamPokemon) {
         self.id = member.id
@@ -36,12 +40,11 @@ final class PokemonTeamMemberViewModel: ObservableObject, Identifiable {
     }
 }
 
-import CoreDesignSystem
-import Foundation
+// MARK: - UI helpers
 
 enum TeamPokemonUIHelpers {
 
-    // MARK: - Type -> Design System
+    // MARK: - Type mapping
 
     static func typeColorToken(_ type: TeamPokemonType) -> DSColorToken {
         switch type {
@@ -67,7 +70,7 @@ enum TeamPokemonUIHelpers {
     }
 
     static func typeSecondaryColorToken(_ type: TeamPokemonType) -> DSColorToken {
-        // hoje é igual, mas deixamos separado p/ evolução futura
+        // Intentionally separated for future evolution.
         typeColorToken(type)
     }
 

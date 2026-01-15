@@ -11,6 +11,8 @@ import CorePersistence
 @MainActor
 final class PokemonTeamViewModel: ObservableObject {
 
+    // MARK: - Types
+
     enum State: Equatable {
         case idle
         case loading
@@ -18,21 +20,29 @@ final class PokemonTeamViewModel: ObservableObject {
         case failed(message: String)
     }
 
+    // MARK: - Published properties
+
     @Published private(set) var members: [TeamPokemon] = []
     @Published var state: State = .idle
 
+    // MARK: - Private properties
+
     private let store: TeamPokemonStore
+
+    // MARK: - Initialization
 
     init(store: TeamPokemonStore) {
         self.store = store
     }
-    
-    // MARK: - Factory default (async)
+
+    // MARK: - Factory (async)
 
     static func makeDefault() async throws -> PokemonTeamViewModel {
         let store = try await TeamPokemonStoreImplementation.makeDefault()
         return PokemonTeamViewModel(store: store)
     }
+
+    // MARK: - Public methods
 
     func loadIfNeeded() async {
         guard case .idle = state else { return }
@@ -41,11 +51,12 @@ final class PokemonTeamViewModel: ObservableObject {
 
     func load() async {
         state = .loading
+
         do {
             members = try await store.fetchTeam()
             state = .loaded
         } catch {
-            state = .failed(message: "Something went wrong")
+            state = .failed(message: .genericErrorMessage)
         }
     }
 
@@ -55,7 +66,13 @@ final class PokemonTeamViewModel: ObservableObject {
             members = try await store.fetchTeam()
             state = .loaded
         } catch {
-            state = .failed(message: "Something went wrong")
+            state = .failed(message: .genericErrorMessage)
         }
     }
+}
+
+// MARK: - Strings
+
+private extension String {
+    static let genericErrorMessage = "Something went wrong"
 }

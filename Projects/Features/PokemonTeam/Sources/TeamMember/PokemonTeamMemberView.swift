@@ -12,10 +12,16 @@ import CoreRemoteImage
 
 struct PokemonTeamMemberView: View {
 
+    // MARK: - State / bindings
+
     @StateObject private var viewModel: PokemonTeamMemberViewModel
+    @State private var isShowingDeleteConfirmation: Bool = false
+
+    // MARK: - Dependencies
+
     private let onDelete: @Sendable (Int) -> Void
 
-    @State private var isShowingDeleteConfirmation: Bool = false
+    // MARK: - Initialization
 
     init(
         member: TeamPokemon,
@@ -25,71 +31,91 @@ struct PokemonTeamMemberView: View {
         self.onDelete = onDelete
     }
 
+    // MARK: - View
+
     var body: some View {
         HStack(alignment: .center, spacing: DSSpacing.medium.value) {
-
-            VStack {
-                DSText(viewModel.name.capitalized, style: .title, color: .textPrimary)
-
-                HStack(spacing: DSSpacing.small.value) {
-                    ForEach(viewModel.types.prefix(2)) { type in
-                        DSPillView(
-                            type.id,
-                            size: .small,
-                            backgroundToken: TeamPokemonUIHelpers.typeColorToken(type),
-                            foregroundToken: .brandPrimaryOn
-                        )
-                    }
-                }
-
-                RemoteImageView(url: viewModel.spriteURL, contentMode: .fit) {
-                    EmptyView()
-                } loading: {
-                    DSLoadingView()
-                } failure: {
-                    EmptyView()
-                }
-                .frame(
-                    width: DSIconSize.jumbo.value,
-                    height: DSIconSize.jumbo.value
-                )
-
-                Button {
-                    isShowingDeleteConfirmation = true
-                } label: {
-                    HStack {
-                        Image(systemName: "trash")
-                            .imageScale(.large)
-                            .foregroundStyle(DSColorToken.textSecondary.color)
-                            .padding(DSSpacing.small.value)
-                            .background(DSColorToken.background.color.opacity(0.3))
-                            .clipShape(
-                                RoundedRectangle(
-                                    cornerRadius: DSRadius.medium.value,
-                                    style: .continuous
-                                )
-                            )
-                    }
-                }
-                .buttonStyle(.plain)
-                .alert("Remove Pokémon?", isPresented: $isShowingDeleteConfirmation) {
-                    Button("Cancel", role: .cancel) { }
-                    Button("Remove", role: .destructive) {
-                        onDelete(viewModel.id)
-                    }
-                } message: {
-                    Text("This will remove \(viewModel.name.capitalized) from your team.")
-                }
-            }
-
-            DSStatsCardView(
-                title: "Stats",
-                rows: viewModel.statsRows
-            )
+            leftColumn
+            statsCard
         }
         .padding(DSSpacing.large.value)
         .background(DSColorToken.surface.color)
         .clipShape(RoundedRectangle(cornerRadius: DSRadius.large.value, style: .continuous))
+    }
+
+    // MARK: - Subviews
+
+    private var leftColumn: some View {
+        VStack {
+            DSText(viewModel.name.capitalized, style: .title, color: .textPrimary)
+
+            typesRow
+
+            pokemonSprite
+
+            deleteButton
+        }
+    }
+
+    private var typesRow: some View {
+        HStack(spacing: DSSpacing.small.value) {
+            ForEach(viewModel.types.prefix(2)) { type in
+                DSPillView(
+                    type.id,
+                    size: .small,
+                    backgroundToken: TeamPokemonUIHelpers.typeColorToken(type),
+                    foregroundToken: .brandPrimaryOn
+                )
+            }
+        }
+    }
+
+    private var pokemonSprite: some View {
+        RemoteImageView(url: viewModel.spriteURL, contentMode: .fit) {
+            EmptyView()
+        } loading: {
+            DSLoadingView()
+        } failure: {
+            EmptyView()
+        }
+        .frame(
+            width: DSIconSize.jumbo.value,
+            height: DSIconSize.jumbo.value
+        )
+    }
+
+    private var deleteButton: some View {
+        Button {
+            isShowingDeleteConfirmation = true
+        } label: {
+            Image(systemName: "trash")
+                .imageScale(.large)
+                .foregroundStyle(DSColorToken.textSecondary.color)
+                .padding(DSSpacing.small.value)
+                .background(DSColorToken.background.color.opacity(0.3))
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: DSRadius.medium.value,
+                        style: .continuous
+                    )
+                )
+        }
+        .buttonStyle(.plain)
+        .alert("Remove Pokémon?", isPresented: $isShowingDeleteConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Remove", role: .destructive) {
+                onDelete(viewModel.id)
+            }
+        } message: {
+            Text("This will remove \(viewModel.name.capitalized) from your team.")
+        }
+    }
+
+    private var statsCard: some View {
+        DSStatsCardView(
+            title: "Stats",
+            rows: viewModel.statsRows
+        )
     }
 }
 

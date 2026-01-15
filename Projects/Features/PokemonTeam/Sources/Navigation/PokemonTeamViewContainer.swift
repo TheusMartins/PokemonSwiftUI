@@ -10,8 +10,12 @@ import CoreDesignSystem
 
 struct PokemonTeamViewContainer: View {
 
+    // MARK: - State
+
     @State private var viewModel: PokemonTeamViewModel?
     @State private var didFail: Bool = false
+
+    // MARK: - View
 
     var body: some View {
         Group {
