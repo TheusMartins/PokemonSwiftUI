@@ -83,16 +83,22 @@ The folder structure in core modules is more layered, separating concerns such a
 
 ### 🎨 CoreDesignSystem
 
-Responsible for UI consistency and reuse across the app.
+All visual components and UI templates in the project include SwiftUI previews for both Light and Dark modes.
 
-Includes:
-- Reusable SwiftUI components
-- Layout tokens for spacing, radius, and sizes
-- Feedback components such as loading views, error screens, and toasts
-- UI templates for larger composition blocks
+This applies to:
+- Reusable components
+- Larger UI templates
+- Feedback elements such as loading, error, and empty states
 
-UI Disclaimer:  
-The UI was implemented by a logic-first iOS engineer. Visual polish was not the main goal. Some inspiration was taken from Pokémon Database, but the focus is architecture and behavior rather than design fidelity.
+Each preview explicitly renders both color schemes. This was done intentionally to simulate a real onboarding experience in a production project.
+
+The goal is to allow a newcomer to:
+- Visually explore components without running the app
+- Understand layout, spacing, and behavior in isolation
+- Quickly validate Light and Dark mode behavior
+- Experiment safely without touching feature code
+
+This approach significantly reduces cognitive load during onboarding and encourages experimentation directly from Xcode previews, which is especially valuable in modular projects with shared design systems.
 
 ### 🌐 CoreNetworking
 
