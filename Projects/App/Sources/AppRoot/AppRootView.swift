@@ -11,20 +11,30 @@ import PokedexListing
 import PokemonTeam
 import CorePersistence
 
+// MARK: - AppTab
+
 enum AppTab: Hashable {
     case pokedex
     case team
     case search
 }
 
+// MARK: - AppRootView
+
 struct AppRootView: View {
+
+    // MARK: - State Objects
+
     @StateObject private var root = AppCompositionRoot()
     @StateObject private var deepLinkCoordinator = DeepLinkCoordinator()
     @StateObject private var searchContext = PokedexListingSearchContext()
 
+    // MARK: - Body
+
     var body: some View {
         Group {
             switch root.state {
+
             case .booting:
                 DSLoadingView(size: DSIconSize.huge.value)
                     .task { await root.start() }
@@ -55,7 +65,7 @@ struct AppRootView: View {
                 PokemonDetailsRouteView(pokemonName: item.name)
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) {
-                            Button("Close") { deepLinkCoordinator.dismissPresentedPokemon() }
+                            Button(String.closeTitle) { deepLinkCoordinator.dismissPresentedPokemon() }
                         }
                     }
             }
@@ -65,12 +75,24 @@ struct AppRootView: View {
     }
 }
 
+// MARK: - MainTabsView
+
 private struct MainTabsView: View {
+
+    // MARK: - Environment
+
     @EnvironmentObject private var deepLinkCoordinator: DeepLinkCoordinator
+
+    // MARK: - State
+
     @State private var pokedexSearchText: String = ""
+
+    // MARK: - Dependencies
 
     let teamStore: TeamPokemonStore
     let searchContext: PokedexListingSearchContext
+
+    // MARK: - Body
 
     var body: some View {
         Group {
@@ -82,11 +104,13 @@ private struct MainTabsView: View {
         }
     }
 
+    // MARK: - iOS 26+
+
     @available(iOS 26.0, *)
     private var tabsIOS26: some View {
         TabView(selection: $deepLinkCoordinator.selectedTab) {
 
-            Tab("Pokédex", systemImage: "magnifyingglass", value: .pokedex) {
+            Tab(String.pokedexTitle, systemImage: .pokedexSystemImage, value: .pokedex) {
                 PokedexListingRouteView(
                     searchText: $pokedexSearchText,
                     usesTabSearch: true,
@@ -94,7 +118,7 @@ private struct MainTabsView: View {
                 )
             }
 
-            Tab("My Team", image: "pokeballIcon", value: .team) {
+            Tab(String.teamTitle, image: .teamAssetImage, value: .team) {
                 PokemonTeamRouteView()
             }
 
@@ -109,25 +133,48 @@ private struct MainTabsView: View {
         }
     }
 
+    // MARK: - iOS < 26
+
     private var tabsLegacy: some View {
         TabView(selection: $deepLinkCoordinator.selectedTab) {
+
             PokedexListingRouteView(
                 searchText: $pokedexSearchText,
                 usesTabSearch: false,
                 searchContext: searchContext
             )
             .tabItem {
-                Image(systemName: "magnifyingglass")
-                Text("Pokédex")
+                Image(systemName: .pokedexSystemImage)
+                Text(String.pokedexTitle)
             }
             .tag(AppTab.pokedex)
 
             PokemonTeamRouteView()
                 .tabItem {
-                    Image("pokeballIcon")
-                    Text("My Team")
+                    Image(.teamAssetImage)
+                    Text(String.teamTitle)
                 }
                 .tag(AppTab.team)
         }
     }
+}
+
+// MARK: - Strings & Assets
+
+private extension String {
+    static let pokedexTitle = "Pokédex"
+    static let teamTitle = "My Team"
+
+    static let pokedexSystemImage = "magnifyingglass"
+    static let teamAssetImage = "pokeballIcon"
+}
+
+private extension Button where Label == Text {
+    static func close(action: @escaping () -> Void) -> some View {
+        Button(String.closeTitle, action: action)
+    }
+}
+
+private extension String {
+    static let closeTitle = "Close"
 }
