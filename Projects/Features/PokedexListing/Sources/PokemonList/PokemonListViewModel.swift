@@ -11,6 +11,7 @@ import Foundation
 final class PokemonListViewModel: ObservableObject {
     private let repository: PokemonListRepository
     private let searchContext: PokedexListingSearchContext
+    private var observeTask: Task<Void, Never>?
 
     @Published var selectedGeneration: GenerationModel?
     @Published private(set) var generations: [GenerationModel] = []
@@ -31,6 +32,17 @@ final class PokemonListViewModel: ObservableObject {
     ) {
         self.repository = repository
         self.searchContext = searchContext
+
+        observeTask = Task { [weak self] in
+            guard let self else { return }
+            for await _ in searchContext.$selectedGenerationId.values {
+                await self.applyGenerationFromContextIfNeeded()
+            }
+        }
+    }
+
+    deinit {
+        observeTask?.cancel()
     }
     
     // MARK: - Derived

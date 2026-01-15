@@ -9,7 +9,14 @@ let project = Project(
             product: .app,
             bundleId: "com.matheusmartins.pokedexshowcase",
             infoPlist: .extendingDefault(with: [
-                "UILaunchScreen": [:]
+                "UILaunchScreen": [:],
+
+                "CFBundleURLTypes": [
+                    [
+                        "CFBundleURLName": "com.matheusmartins.pokedexshowcase",
+                        "CFBundleURLSchemes": ["pokedex"]
+                    ]
+                ]
             ]),
             sources: ["Sources/**"],
             resources: ["Resources/**"],

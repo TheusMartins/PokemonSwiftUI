@@ -9,30 +9,38 @@ import Foundation
 
 enum DeepLinkParser {
     static func parse(_ url: URL) -> DeepLink? {
-        // Ex: pokedex://pokemon/bulbasaur
         guard url.scheme == "pokedex" else { return nil }
 
-        let host = url.host ?? ""
+        let host = (url.host ?? "").lowercased()
         let path = url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
 
-        if host == "pokemon" {
-            let name = path.isEmpty ? (URLComponents(url: url, resolvingAgainstBaseURL: false)?
+        switch host {
+
+        case "pokemon":
+            let nameFromPath = path
+            let nameFromQuery = URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?
                 .first(where: { $0.name == "name" })?
-                .value ?? "") : path
+                .value
 
-            let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-            return trimmed.isEmpty ? nil : .pokemonDetails(name: trimmed.lowercased())
-        }
+            let name = (nameFromPath.isEmpty ? (nameFromQuery ?? "") : nameFromPath)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
 
-        if host == "pokedex" {
+            return name.isEmpty ? nil : .pokemonDetails(name: name.lowercased())
+
+        case "pokedex":
             let gen = URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?
                 .first(where: { $0.name == "generation" })?
                 .value
-            return .pokedex(generationId: gen)
-        }
 
-        return nil
+            return .pokedex(generationId: gen)
+
+        case "team":
+            return .team
+
+        default:
+            return nil
+        }
     }
 }

@@ -14,11 +14,13 @@ import CorePersistence
 enum AppTab: Hashable {
     case pokedex
     case team
+    case search
 }
 
 struct AppRootView: View {
     @StateObject private var root = AppCompositionRoot()
     @StateObject private var deepLinkCoordinator = DeepLinkCoordinator()
+    @StateObject private var searchContext = PokedexListingSearchContext()
 
     var body: some View {
         Group {
@@ -33,11 +35,17 @@ struct AppRootView: View {
                 }
 
             case .ready(let teamStore):
-                MainTabsView(teamStore: teamStore)
-                    .environmentObject(deepLinkCoordinator)
+                MainTabsView(
+                    teamStore: teamStore,
+                    searchContext: searchContext
+                )
+                .environmentObject(deepLinkCoordinator)
             }
         }
         .background(DSColorToken.background.color)
+        .task {
+            deepLinkCoordinator.bind(searchContext: searchContext)
+        }
         .onOpenURL { url in
             guard let link = DeepLinkParser.parse(url) else { return }
             deepLinkCoordinator.handle(link)
@@ -47,9 +55,7 @@ struct AppRootView: View {
                 PokemonDetailsRouteView(pokemonName: item.name)
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) {
-                            Button("Close") {
-                                deepLinkCoordinator.dismissPresentedPokemon() 
-                            }
+                            Button("Close") { deepLinkCoordinator.dismissPresentedPokemon() }
                         }
                     }
             }
@@ -60,12 +66,11 @@ struct AppRootView: View {
 }
 
 private struct MainTabsView: View {
-    @StateObject private var searchContext = PokedexListingSearchContext()
-
     @EnvironmentObject private var deepLinkCoordinator: DeepLinkCoordinator
     @State private var pokedexSearchText: String = ""
 
     let teamStore: TeamPokemonStore
+    let searchContext: PokedexListingSearchContext
 
     var body: some View {
         Group {
@@ -79,9 +84,9 @@ private struct MainTabsView: View {
 
     @available(iOS 26.0, *)
     private var tabsIOS26: some View {
-        TabView {
+        TabView(selection: $deepLinkCoordinator.selectedTab) {
 
-            Tab("Pokédex", systemImage: "magnifyingglass") {
+            Tab("Pokédex", systemImage: "magnifyingglass", value: .pokedex) {
                 PokedexListingRouteView(
                     searchText: $pokedexSearchText,
                     usesTabSearch: true,
@@ -89,11 +94,11 @@ private struct MainTabsView: View {
                 )
             }
 
-            Tab("My Team", image: "pokeballIcon") {
+            Tab("My Team", image: "pokeballIcon", value: .team) {
                 PokemonTeamRouteView()
             }
 
-            Tab(role: .search) {
+            Tab(value: .search, role: .search) {
                 PokedexListingRouteView(
                     searchText: $pokedexSearchText,
                     usesTabSearch: true,
