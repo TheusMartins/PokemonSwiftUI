@@ -21,12 +21,13 @@ final class DefaultJSONStoreTests: XCTestCase {
 
         // When
         try await sut.set(DummyEncodable(value: "pikachu"), for: key)
+        let calls = await kvSpy.setCalls
 
         // Then
         XCTAssertEqual(coder.encodeCallsCount, 1)
-        XCTAssertEqual(kvSpy.setCalls.count, 1)
-        XCTAssertEqual(kvSpy.setCalls.first?.key, key)
-        XCTAssertEqual(kvSpy.setCalls.first?.data, Data("encoded".utf8))
+        XCTAssertEqual(calls.count, 1)
+        XCTAssertEqual(calls.first?.key, key)
+        XCTAssertEqual(calls.first?.data, Data("encoded".utf8))
     }
 
     func test_set_givenCoderThrows_whenCalled_thenThrowsAndDoesNotCallStore() async {
@@ -37,6 +38,7 @@ final class DefaultJSONStoreTests: XCTestCase {
 
         let sut = makeSUT(store: kvSpy, coder: coder)
         let key = PersistenceKey("any-key")
+        let calls = await kvSpy.setCalls
 
         // When / Then
         do {
@@ -44,14 +46,14 @@ final class DefaultJSONStoreTests: XCTestCase {
             XCTFail("Expected to throw, but succeeded.")
         } catch {
             XCTAssertTrue(error is DummyError)
-            XCTAssertTrue(kvSpy.setCalls.isEmpty)
+            XCTAssertTrue(calls.isEmpty)
         }
     }
 
     func test_get_givenNoDataInStore_whenCalled_thenReturnsNilAndDoesNotDecode() async throws {
         // Given
         let kvSpy = KeyValueStoreSpy()
-        kvSpy.stubbedGetResult = .success(nil)
+        await kvSpy.stubGet(.success(nil))
 
         let coder = JSONCoderSpy()
         let sut = makeSUT(store: kvSpy, coder: coder)
@@ -67,7 +69,7 @@ final class DefaultJSONStoreTests: XCTestCase {
     func test_get_givenDataInStore_whenDecodeSucceeds_thenReturnsDecodedValue() async throws {
         // Given
         let kvSpy = KeyValueStoreSpy()
-        kvSpy.stubbedGetResult = .success(Data("payload".utf8))
+        await kvSpy.stubGet(.success(Data("payload".utf8)))
 
         let coder = JSONCoderSpy()
         coder.stubbedDecodeResult = .success(DummyDecodable(value: "scizor"))
@@ -85,7 +87,7 @@ final class DefaultJSONStoreTests: XCTestCase {
     func test_get_givenStoreThrows_whenCalled_thenThrowsAndDoesNotDecode() async {
         // Given
         let kvSpy = KeyValueStoreSpy()
-        kvSpy.stubbedGetResult = .failure(DummyError.any)
+        await kvSpy.stubGet(.failure(DummyError.any))
 
         let coder = JSONCoderSpy()
         let sut = makeSUT(store: kvSpy, coder: coder)
@@ -103,7 +105,7 @@ final class DefaultJSONStoreTests: XCTestCase {
     func test_get_givenDecodeThrows_whenCalled_thenThrows() async {
         // Given
         let kvSpy = KeyValueStoreSpy()
-        kvSpy.stubbedGetResult = .success(Data("payload".utf8))
+        await kvSpy.stubGet(.success(Data("payload".utf8)))
 
         let coder = JSONCoderSpy()
         coder.stubbedDecodeResult = .failure(DummyError.any)
@@ -129,7 +131,8 @@ final class DefaultJSONStoreTests: XCTestCase {
         try await sut.remove(for: key)
 
         // Then
-        XCTAssertEqual(kvSpy.removeCalls, [key])
+        let calls = await kvSpy.removeCalls
+        XCTAssertEqual(calls, [key])
     }
 
     // MARK: - Helpers
@@ -144,17 +147,25 @@ final class DefaultJSONStoreTests: XCTestCase {
 
 // MARK: - Spies & Fixtures (same file)
 
-private final class KeyValueStoreSpy: KeyValueStoring {
+private actor KeyValueStoreSpy: KeyValueStoring {
 
     struct SetCall: Equatable {
         let data: Data
         let key: PersistenceKey
     }
 
-    var setCalls: [SetCall] = []
-    var removeCalls: [PersistenceKey] = []
+    private(set) var setCalls: [SetCall] = []
+    private(set) var removeCalls: [PersistenceKey] = []
 
-    var stubbedGetResult: Result<Data?, Error> = .success(nil)
+    private var stubbedGetResult: Result<Data?, Error> = .success(nil)
+
+    // MARK: - Stubbing
+
+    func stubGet(_ result: Result<Data?, Error>) {
+        stubbedGetResult = result
+    }
+
+    // MARK: - KeyValueStoring
 
     func set(_ data: Data, for key: PersistenceKey) async throws {
         setCalls.append(.init(data: data, key: key))
@@ -171,7 +182,7 @@ private final class KeyValueStoreSpy: KeyValueStoring {
     func removeAll() async throws { }
 }
 
-private final class JSONCoderSpy: JSONCoding {
+private final class JSONCoderSpy: JSONCoding, @unchecked Sendable {
 
     var encodeCallsCount: Int = 0
     var decodeCallsCount: Int = 0
