@@ -13,28 +13,28 @@ protocol PokemonDetailsRepository {
 }
 
 final class PokemonDetailsRepositoryImpl: PokemonDetailsRepository {
+
     private let requester: Requester
 
     init(requester: Requester = DefaultRequester()) {
         self.requester = requester
     }
 
-    func getPokemonDetails(name: String) async throws -> PokemonDetailsModel {
-        let response = try await requester.request(basedOn: PokemonDetailsRequest.getDetails(name: name))
+    // MARK: - Public API
 
-        return try parsePokemonDetailsResponse(response: response)
+    func getPokemonDetails(name: String) async throws -> PokemonDetailsModel {
+        let response = try await requester.request(
+            basedOn: PokemonDetailsRequest.getDetails(name: name)
+        )
+
+        return try parsePokemonDetailsResponse(response)
     }
 
-    // MARK: - Private methods
+    // MARK: - Parsing
 
     private func parsePokemonDetailsResponse(
-        response: RequestSuccessResponse
+        _ response: RequestSuccessResponse
     ) throws -> PokemonDetailsModel {
-        do {
-            let model = try JSONDecoder().decode(PokemonDetailsModel.self,from: response.data)
-            return model
-        } catch {
-            throw error
-        }
+        try JSONDecoder().decode(PokemonDetailsModel.self, from: response.data)
     }
 }

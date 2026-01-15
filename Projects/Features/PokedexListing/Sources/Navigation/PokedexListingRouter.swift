@@ -9,7 +9,12 @@ import Foundation
 
 @MainActor
 final class PokedexListingRouter: ObservableObject {
+
+    // MARK: - Properties
+
     @Published var path: [PokedexListingRoute] = []
+
+    // MARK: - Navigation
 
     func push(_ route: PokedexListingRoute) {
         path.append(route)
@@ -23,7 +28,9 @@ final class PokedexListingRouter: ObservableObject {
         path.removeAll()
     }
 
-    /// Deep link entry-point: abre a pokedex já “empurrando” o destino
+    // MARK: - Deep Linking
+
+    /// Deep link entry-point: opens the Pokédex already pushing the destination
     func openPokemonDetails(name: String) {
         path = [.pokemonDetails(name: name)]
     }

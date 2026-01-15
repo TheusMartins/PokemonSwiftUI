@@ -11,8 +11,6 @@ import CoreNetworking
 
 final class PokemonDetailsRepositoryImplTests: XCTestCase {
 
-    // MARK: - Tests
-
     func test_getPokemonDetails_givenName_whenCalled_thenRequestsCorrectEndpoint() async throws {
         // Given
         let spy = RequesterSpy()

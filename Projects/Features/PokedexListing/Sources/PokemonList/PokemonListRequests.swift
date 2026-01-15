@@ -5,36 +5,40 @@
 //  Created by Matheus Martins on 10/01/26.
 //
 
-import CoreNetworking
 import Foundation
+import CoreNetworking
+
+// MARK: - Requests
 
 enum PokemonListRequests {
     case getGenerations
     case getPokemons(generationId: String)
 }
 
+// MARK: - RequestInfos
+
 extension PokemonListRequests: RequestInfos {
+
     var endpoint: String {
         switch self {
         case .getGenerations:
-            return .endpoint
+            return .generationEndpoint
+
         case .getPokemons(let generationId):
-            return "\(String.endpoint)\(generationId)"
+            return "\(String.generationEndpoint)\(generationId)"
         }
     }
-    
-    var method: CoreNetworking.HTTPMethod {
+
+    var method: HTTPMethod {
         switch self {
-        case .getGenerations:
-            return .get
-        case .getPokemons:
+        case .getGenerations, .getPokemons:
             return .get
         }
     }
 }
 
+// MARK: - Constants
+
 private extension String {
-    static var endpoint: String {
-        "generation/"
-    }
+    static let generationEndpoint = "generation/"
 }

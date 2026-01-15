@@ -11,8 +11,6 @@ import CoreNetworking
 
 final class PokemonListRepositoryImplTests: XCTestCase {
 
-    // MARK: - getGenerations
-
     func test_getGenerations_whenCalled_thenRequestsCorrectEndpoint() async throws {
         // Given
         let spy = RequesterSpy()
@@ -92,8 +90,6 @@ final class PokemonListRepositoryImplTests: XCTestCase {
             XCTAssertTrue(error is DecodingError)
         }
     }
-
-    // MARK: - getPokemon(generationId:)
 
     func test_getPokemon_givenGenerationId_whenCalled_thenRequestsCorrectEndpoint() async throws {
         // Given

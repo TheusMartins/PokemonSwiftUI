@@ -12,8 +12,6 @@ import CorePersistence
 @MainActor
 final class PokemonDetailsViewModelTests: XCTestCase {
 
-    // MARK: - Tests (Init)
-
     func test_init_setsInitialStateToIdle_andModelIsNil() async {
         // Given
         let sut = makeSUT(pokemonName: "Scizor")
@@ -28,7 +26,6 @@ final class PokemonDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.isConfirmPresented, false)
     }
 
-    // MARK: - Tests (LoadIfNeeded)
 
     func test_loadIfNeeded_givenStateIsIdle_whenCalled_thenLoads_requestsLowercasedName_andChecksContains() async {
         // Given
@@ -155,8 +152,6 @@ final class PokemonDetailsViewModelTests: XCTestCase {
         let containsCalls = await teamStore.containsCalls
         XCTAssertEqual(containsCalls.count, 0)
     }
-
-    // MARK: - Tests (Confirm Flow)
 
     func test_didTapTeamAction_whenModelIsNil_doesNothing() {
         // Given

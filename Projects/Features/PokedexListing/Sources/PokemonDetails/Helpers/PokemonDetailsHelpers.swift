@@ -36,7 +36,6 @@ enum PokemonDetailsHelpers {
     }
 
     static func typeSecondaryColorToken(_ type: PokemonType) -> DSColorToken {
-        // hoje é igual, mas deixamos separado p/ evolução futura
         typeColorToken(type)
     }
 

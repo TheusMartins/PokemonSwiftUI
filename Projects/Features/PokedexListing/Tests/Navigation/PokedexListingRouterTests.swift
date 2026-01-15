@@ -11,8 +11,6 @@ import XCTest
 @MainActor
 final class PokedexListingRouterTests: XCTestCase {
 
-    // MARK: - Init
-
     func test_init_givenRouter_whenCreated_thenStartsWithEmptyPath() {
         // Given
         let sut = makeSUT()
@@ -20,8 +18,6 @@ final class PokedexListingRouterTests: XCTestCase {
         // Then
         XCTAssertTrue(sut.path.isEmpty)
     }
-
-    // MARK: - Push
 
     func test_push_givenEmptyPath_whenPushingRoute_thenAppendsRouteToPath() {
         // Given
@@ -33,8 +29,6 @@ final class PokedexListingRouterTests: XCTestCase {
         // Then
         XCTAssertEqual(sut.path, [.pokemonDetails(name: "scizor")])
     }
-
-    // MARK: - Pop
 
     func test_pop_givenPathWithOneElement_whenCalled_thenRemovesLastElement() {
         // Given
@@ -73,8 +67,6 @@ final class PokedexListingRouterTests: XCTestCase {
         // Then
         XCTAssertTrue(sut.path.isEmpty)
     }
-
-    // MARK: - Deep Link
 
     func test_openPokemonDetails_givenExistingPath_whenCalled_thenReplacesPathWithSingleDetailsRoute() {
         // Given

@@ -9,32 +9,27 @@ import Foundation
 import SwiftUI
 import CoreDesignSystem
 
+// MARK: - View
+
 struct PokemonListView: View {
+
+    // MARK: - Dependencies
+
     @ObservedObject var viewModel: PokemonListViewModel
     let onPokemonSelected: (String) -> Void
     @Binding var searchText: String
     let usesTabSearch: Bool
 
-    public var body: some View {
+    // MARK: - Body
+
+    var body: some View {
         Group {
             switch viewModel.state {
             case .idle, .loading:
                 DSLoadingView(size: DSIconSize.huge.value)
 
             case .loaded:
-                VStack {
-                    makePicker(generations: viewModel.generations)
-                    
-                    if !usesTabSearch {
-                        DSSearchBar(
-                            text: $searchText,
-                            placeholder: "Search Pokémon"
-                        )
-                        .padding(.horizontal, DSSpacing.xLarge.value)
-                    }
-                    
-                    makeList(pokemons: viewModel.filteredPokemons)
-                }
+                content
 
             case .failed(let errorMessage):
                 DSErrorScreenView(title: errorMessage) {
@@ -52,6 +47,26 @@ struct PokemonListView: View {
         }
     }
 
+    // MARK: - Content
+
+    private var content: some View {
+        VStack {
+            makePicker(generations: viewModel.generations)
+
+            if !usesTabSearch {
+                DSSearchBar(
+                    text: $searchText,
+                    placeholder: "Search Pokémon"
+                )
+                .padding(.horizontal, DSSpacing.xLarge.value)
+            }
+
+            makeList(pokemons: viewModel.filteredPokemons)
+        }
+    }
+
+    // MARK: - Components
+
     private func makePicker(generations: [GenerationModel]) -> some View {
         Group {
             if let selected = viewModel.selectedGeneration {
@@ -67,8 +82,6 @@ struct PokemonListView: View {
                     label: { $0.name.capitalized }
                 )
                 .background(DSColorToken.background.color)
-            } else {
-                EmptyView()
             }
         }
     }

@@ -20,14 +20,17 @@ struct PokemonDetailsView: View {
         ZStack(alignment: .top) {
             contentRoot
                 .background(DSColorToken.background.color)
-                .navigationTitle(viewModel.model?.name.capitalized ?? "Details")
+                .navigationTitle(navigationTitle)
                 .navigationBarTitleDisplayMode(.inline)
                 .task {
                     await viewModel.loadIfNeeded()
                     await viewModel.refreshTeamStatus()
                 }
                 .alert("Team", isPresented: $viewModel.isConfirmPresented) {
-                    Button(viewModel.isInTeam ? "Remove" : "Add", role: viewModel.isInTeam ? .destructive : nil) {
+                    Button(
+                        viewModel.isInTeam ? "Remove" : "Add",
+                        role: viewModel.isInTeam ? .destructive : nil
+                    ) {
                         Task { await viewModel.confirmTeamAction() }
                     }
 
@@ -49,7 +52,7 @@ struct PokemonDetailsView: View {
             DSLoadingView(size: DSIconSize.huge.value)
 
         case .loaded:
-            makeContent()
+            content
 
         case .failed(let errorMessage):
             DSErrorScreenView(title: errorMessage) {
@@ -60,13 +63,13 @@ struct PokemonDetailsView: View {
 
     // MARK: - Content
 
-    private func makeContent() -> some View {
+    private var content: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DSSpacing.xLarge.value) {
-                makeSpritesRow()
-                makeTypesSection()
-                makeStatsSection()
-                teamActionButton()
+                spritesRow
+                typesSection
+                statsSection
+                teamActionButton
             }
             .padding(.horizontal, DSSpacing.xLarge.value)
             .padding(.top, DSSpacing.large.value)
@@ -74,7 +77,7 @@ struct PokemonDetailsView: View {
         }
     }
 
-    private func makeSpritesRow() -> some View {
+    private var spritesRow: some View {
         let frontDefault = viewModel.model?.sprites.frontDefault
         let frontShiny = viewModel.model?.sprites.frontShiny
 
@@ -87,7 +90,7 @@ struct PokemonDetailsView: View {
     // MARK: - Types
 
     @ViewBuilder
-    private func makeTypesSection() -> some View {
+    private var typesSection: some View {
         if let types = viewModel.model?.types, !types.isEmpty {
             VStack(alignment: .leading, spacing: DSSpacing.medium.value) {
                 DSText("Types", style: .title)
@@ -108,7 +111,7 @@ struct PokemonDetailsView: View {
     // MARK: - Stats
 
     @ViewBuilder
-    private func makeStatsSection() -> some View {
+    private var statsSection: some View {
         if let model = viewModel.model {
             let rows: [DSStatsCardView.Row] = PokemonStatKind.allCases.map { kind in
                 let value = model.statValue(kind) ?? .zero
@@ -131,8 +134,7 @@ struct PokemonDetailsView: View {
 
     // MARK: - Team Action
 
-    @ViewBuilder
-    private func teamActionButton() -> some View {
+    private var teamActionButton: some View {
         DSButton(
             title: viewModel.isInTeam ? "Remove from Team" : "Add to Team",
             style: viewModel.isInTeam ? .secondary : .primary,
@@ -148,8 +150,12 @@ struct PokemonDetailsView: View {
     private var confirmMessage: String {
         guard let name = viewModel.model?.name.capitalized else { return "" }
         return viewModel.isInTeam
-            ? "Remove \(name) from your team?"
-            : "Add \(name) to your team?"
+        ? "Remove \(name) from your team?"
+        : "Add \(name) to your team?"
+    }
+
+    private var navigationTitle: String {
+        viewModel.model?.name.capitalized ?? "Details"
     }
 
     // MARK: - Toast

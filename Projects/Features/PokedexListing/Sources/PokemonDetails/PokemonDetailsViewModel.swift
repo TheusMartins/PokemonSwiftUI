@@ -6,25 +6,14 @@
 //
 
 import Foundation
-import CorePersistence
-import CoreDesignSystem
 import SwiftUI
+import CoreDesignSystem
+import CorePersistence
 
 @MainActor
 final class PokemonDetailsViewModel: ObservableObject {
-    private let repository: PokemonDetailsRepository
-    private let pokemonName: String
-    private let teamStore: TeamPokemonStore
 
-    @Published private(set) var model: PokemonDetailsModel?
-    @Published var state: State = .idle
-
-    @Published private(set) var isInTeam: Bool = false
-    @Published private(set) var isTeamActionInProgress: Bool = false
-    @Published var teamErrorMessage: String?
-
-    @Published var feedbackToast: FeedbackToast?
-    @Published var isConfirmPresented: Bool = false
+    // MARK: - Types
 
     struct FeedbackToast: Equatable, Identifiable {
         let id = UUID()
@@ -45,7 +34,29 @@ final class PokemonDetailsViewModel: ObservableObject {
         case remove
     }
 
+    // MARK: - Dependencies
+
+    private let repository: PokemonDetailsRepository
+    private let pokemonName: String
+    private let teamStore: TeamPokemonStore
+
+    // MARK: - Published state
+
+    @Published private(set) var model: PokemonDetailsModel?
+    @Published var state: State = .idle
+
+    @Published private(set) var isInTeam: Bool = false
+    @Published private(set) var isTeamActionInProgress: Bool = false
+    @Published var teamErrorMessage: String?
+
+    @Published var feedbackToast: FeedbackToast?
+    @Published var isConfirmPresented: Bool = false
+
+    // MARK: - Private state
+
     private var pendingAction: PendingAction?
+
+    // MARK: - Init
 
     init(
         pokemonName: String,
@@ -87,24 +98,48 @@ final class PokemonDetailsViewModel: ObservableObject {
 
     func confirmTeamAction() async {
         guard let model else { return }
-        guard let pendingAction else { return }
+        guard let action = pendingAction else { return }
 
         isConfirmPresented = false
-        self.pendingAction = nil
+        pendingAction = nil
 
+        await runTeamAction(action, model: model)
+    }
+
+    // MARK: - Team refresh
+
+    func refreshTeamStatus() async {
+        guard let model else { return }
+        do {
+            isInTeam = try await teamStore.contains(memberId: model.id)
+        } catch {
+            // Silent failure: we don't want to break the details screen UX.
+        }
+    }
+
+    // MARK: - Toast
+
+    func dismissToast() {
+        withAnimation(.snappy) {
+            feedbackToast = nil
+        }
+    }
+
+    // MARK: - Private helpers
+
+    private func runTeamAction(_ action: PendingAction, model: PokemonDetailsModel) async {
         isTeamActionInProgress = true
         defer { isTeamActionInProgress = false }
 
         // Fake load to make the action feel deliberate.
-        // This also helps the user notice the button loading state.
         try? await Task.sleep(nanoseconds: 180_000_000)
 
         do {
-            switch pendingAction {
+            switch action {
             case .remove:
                 try await teamStore.delete(memberId: model.id)
                 isInTeam = false
-
+                teamErrorMessage = nil
                 showToast(
                     title: "Removed from team",
                     message: "\(model.name.capitalized) was removed.",
@@ -114,7 +149,7 @@ final class PokemonDetailsViewModel: ObservableObject {
             case .add:
                 try await teamStore.save(model.asTeamPokemon())
                 isInTeam = true
-
+                teamErrorMessage = nil
                 showToast(
                     title: "Added to team",
                     message: "\(model.name.capitalized) was added.",
@@ -122,27 +157,11 @@ final class PokemonDetailsViewModel: ObservableObject {
                 )
             }
 
-            teamErrorMessage = nil
-
         } catch let error as TeamPokemonStoreError {
-            switch error {
-            case .alreadyExists:
-                isInTeam = true
-                teamErrorMessage = "This Pokémon is already in your team."
-
-            case .teamIsFull(let max):
-                teamErrorMessage = "Your team is full (max \(max))."
-            }
-
-            showToast(
-                title: "Action failed",
-                message: teamErrorMessage,
-                style: .error
-            )
+            handleTeamStoreError(error, pokemonName: model.name)
 
         } catch {
             teamErrorMessage = "Something went wrong."
-
             showToast(
                 title: "Action failed",
                 message: teamErrorMessage,
@@ -150,33 +169,36 @@ final class PokemonDetailsViewModel: ObservableObject {
             )
         }
     }
-    
-    // MARK: - Team refresh
 
-    func refreshTeamStatus() async {
-        guard let model else { return }
-        do {
-            isInTeam = try await teamStore.contains(memberId: model.id)
-        } catch {
-            // Silent failure: we don't want to break the details screen UX
-            // If you prefer, you can set a toast/error here.
+    private func handleTeamStoreError(_ error: TeamPokemonStoreError, pokemonName: String) {
+        switch error {
+        case .alreadyExists:
+            isInTeam = true
+            teamErrorMessage = "This Pokémon is already in your team."
+
+        case .teamIsFull(let max):
+            teamErrorMessage = "Your team is full (max \(max))."
         }
-    }
 
-    func dismissToast() {
-        withAnimation(.snappy) {
-            feedbackToast = nil
-        }
+        showToast(
+            title: "Action failed",
+            message: teamErrorMessage,
+            style: .error
+        )
     }
-
-    // MARK: - Helpers
 
     private func showToast(title: String, message: String?, style: DSFeedbackStyle) {
         withAnimation(.snappy) {
-            feedbackToast = FeedbackToast(title: title, message: message, style: style)
+            feedbackToast = FeedbackToast(
+                title: title,
+                message: message,
+                style: style
+            )
         }
     }
 }
+
+// MARK: - Mapping
 
 extension PokemonDetailsModel {
     func asTeamPokemon() -> TeamPokemon {

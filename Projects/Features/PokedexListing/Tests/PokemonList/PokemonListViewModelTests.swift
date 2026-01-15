@@ -11,8 +11,6 @@ import XCTest
 @MainActor
 final class PokemonListViewModelTests: XCTestCase {
 
-    // MARK: - Tests
-
     func test_init_setsInitialStateToIdle_andCollectionsAreEmpty() {
         // Given
         let sut = makeSUT()
