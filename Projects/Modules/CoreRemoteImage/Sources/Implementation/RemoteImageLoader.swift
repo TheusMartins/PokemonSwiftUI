@@ -10,13 +10,21 @@ import UIKit
 import CoreNetworking
 
 public enum RemoteImageError: Error, Equatable {
+
+    // MARK: - Cases
+
     case invalidStatusCode(Int)
     case invalidImageData
 }
 
 public actor RemoteImageLoader: ImageLoading {
+
+    // MARK: - Private Properties
+
     private let requester: Requester
     private let cache: ImageCaching
+
+    // MARK: - Initialization
 
     public init(
         requester: Requester = DefaultRequester(),
@@ -25,6 +33,8 @@ public actor RemoteImageLoader: ImageLoading {
         self.requester = requester
         self.cache = cache
     }
+
+    // MARK: - Public Methods
 
     public func loadImageData(from url: URL) async throws -> Data {
         let key = url.absoluteString

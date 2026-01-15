@@ -8,9 +8,16 @@
 import Foundation
 
 public actor InMemoryImageCache: ImageCaching {
+
+    // MARK: - Private Properties
+
     private let cache = NSCache<NSString, NSData>()
 
+    // MARK: - Initialization
+
     public init() {}
+
+    // MARK: - Public Methods
 
     public func data(forKey key: String) async -> Data? {
         cache.object(forKey: key as NSString) as Data?
@@ -21,6 +28,7 @@ public actor InMemoryImageCache: ImageCaching {
             await remove(forKey: key)
             return
         }
+
         cache.setObject(data as NSData, forKey: key as NSString)
     }
 

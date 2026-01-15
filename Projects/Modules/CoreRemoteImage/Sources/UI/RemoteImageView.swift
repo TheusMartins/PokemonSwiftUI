@@ -7,16 +7,22 @@
 
 import SwiftUI
 
+// MARK: - RemoteImageView
+
 public struct RemoteImageView<Placeholder: View, Loading: View, Failure: View>: View {
+
+    // MARK: - Private Properties
 
     private let url: URL?
     private let contentMode: ContentMode
     private let placeholder: Placeholder
     private let loading: Loading
     private let failure: Failure
+    private let loader: any ImageLoading
 
     @StateObject private var model: RemoteImageModel
-    private let loader: any ImageLoading
+
+    // MARK: - Initialization
 
     public init(
         url: URL?,
@@ -36,6 +42,8 @@ public struct RemoteImageView<Placeholder: View, Loading: View, Failure: View>: 
         _model = StateObject(wrappedValue: RemoteImageModel(loader: loader))
     }
 
+    // MARK: - View
+
     public var body: some View {
         ZStack {
             switch model.state {
@@ -47,7 +55,10 @@ public struct RemoteImageView<Placeholder: View, Loading: View, Failure: View>: 
                 loading
 
             case .success(let data):
-                RemoteImageDataView(data: data, contentMode: contentMode)
+                RemoteImageDataView(
+                    data: data,
+                    contentMode: contentMode
+                )
 
             case .failure:
                 failure
@@ -59,9 +70,16 @@ public struct RemoteImageView<Placeholder: View, Loading: View, Failure: View>: 
     }
 }
 
+// MARK: - RemoteImageDataView
+
 private struct RemoteImageDataView: View {
+
+    // MARK: - Properties
+
     let data: Data
     let contentMode: ContentMode
+
+    // MARK: - View
 
     var body: some View {
         if let uiImage = UIImage(data: data) {

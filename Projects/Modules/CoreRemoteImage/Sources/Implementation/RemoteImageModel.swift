@@ -9,14 +9,23 @@ import SwiftUI
 
 @MainActor
 public final class RemoteImageModel: ObservableObject {
+
+    // MARK: - Published Properties
+
     @Published public private(set) var state: RemoteImageState = .idle
+
+    // MARK: - Private Properties
 
     private let loader: ImageLoading
     private var task: Task<Void, Never>?
 
+    // MARK: - Initialization
+
     public init(loader: ImageLoading = RemoteImageLoader()) {
         self.loader = loader
     }
+
+    // MARK: - Public Methods
 
     public func load(url: URL?) async {
         task?.cancel()
@@ -28,14 +37,12 @@ public final class RemoteImageModel: ObservableObject {
 
         task = Task { [weak self] in
             guard let self else { return }
+
             do {
                 let imageData = try await loader.loadImageData(from: url)
                 self.state = .success(imageData)
             } catch {
-                if Task.isCancelled {
-                    return
-                }
-                
+                if Task.isCancelled { return }
                 self.state = .failure
             }
         }
