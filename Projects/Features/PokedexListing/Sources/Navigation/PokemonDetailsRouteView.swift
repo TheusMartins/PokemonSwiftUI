@@ -9,49 +9,68 @@ import SwiftUI
 import CoreDesignSystem
 import CorePersistence
 
-struct PokemonDetailsRouteView: View {
+public struct PokemonDetailsRouteView: View {
 
     private let pokemonName: String
 
-    @State private var viewModel: PokemonDetailsViewModel?
-    @State private var didFailBuildingDependencies: Bool = false
+    @StateObject private var builder = Builder()
 
-    init(pokemonName: String) {
+    public init(pokemonName: String) {
         self.pokemonName = pokemonName
     }
 
-    var body: some View {
+    public var body: some View {
         Group {
-            if let viewModel {
-                PokemonDetailsView(viewModel: viewModel)
-            } else if didFailBuildingDependencies {
-                DSErrorScreenView {
-                    Task { await build() }
-                }
-            } else {
+            switch builder.state {
+            case .idle, .loading:
                 DSLoadingView(size: DSIconSize.huge.value)
+
+            case .failed:
+                DSErrorScreenView {
+                    Task { await builder.build(pokemonName: pokemonName) }
+                }
+
+            case .ready(let viewModel):
+                PokemonDetailsView(viewModel: viewModel)
             }
         }
         .task {
-            await buildIfNeeded()
+            await builder.buildIfNeeded(pokemonName: pokemonName)
         }
     }
+}
 
-    private func buildIfNeeded() async {
-        guard viewModel == nil, !didFailBuildingDependencies else { return }
-        await build()
-    }
+private extension PokemonDetailsRouteView {
 
-    private func build() async {
-        do {
-            let store = try await TeamPokemonStoreImplementation.makeDefault()
-            viewModel = PokemonDetailsViewModel(
-                pokemonName: pokemonName,
-                teamStore: store
-            )
-            didFailBuildingDependencies = false
-        } catch {
-            didFailBuildingDependencies = true
+    @MainActor
+    final class Builder: ObservableObject {
+
+        enum State {
+            case idle
+            case loading
+            case failed
+            case ready(PokemonDetailsViewModel)
+        }
+
+        @Published private(set) var state: State = .idle
+
+        func buildIfNeeded(pokemonName: String) async {
+            guard case .idle = state else { return }
+            await build(pokemonName: pokemonName)
+        }
+
+        func build(pokemonName: String) async {
+            state = .loading
+            do {
+                let store = try await TeamPokemonStoreImplementation.makeDefault()
+                let viewModel = PokemonDetailsViewModel(
+                    pokemonName: pokemonName,
+                    teamStore: store
+                )
+                state = .ready(viewModel)
+            } catch {
+                state = .failed
+            }
         }
     }
 }

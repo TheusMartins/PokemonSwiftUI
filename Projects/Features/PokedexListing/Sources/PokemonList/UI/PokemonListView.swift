@@ -45,6 +45,7 @@ struct PokemonListView: View {
         .background(DSColorToken.background.color)
         .task {
             await viewModel.loadIfNeeded()
+            await viewModel.applyGenerationFromContextIfNeeded()
         }
         .onChange(of: searchText) { _, newValue in
             viewModel.searchText = newValue

@@ -11,9 +11,14 @@ import PokedexListing
 import PokemonTeam
 import CorePersistence
 
-struct AppRootView: View {
+enum AppTab: Hashable {
+    case pokedex
+    case team
+}
 
+struct AppRootView: View {
     @StateObject private var root = AppCompositionRoot()
+    @StateObject private var deepLinkCoordinator = DeepLinkCoordinator()
 
     var body: some View {
         Group {
@@ -29,32 +34,53 @@ struct AppRootView: View {
 
             case .ready(let teamStore):
                 MainTabsView(teamStore: teamStore)
+                    .environmentObject(deepLinkCoordinator)
             }
         }
         .background(DSColorToken.background.color)
+        .onOpenURL { url in
+            guard let link = DeepLinkParser.parse(url) else { return }
+            deepLinkCoordinator.handle(link)
+        }
+        .sheet(item: $deepLinkCoordinator.presentedPokemon) { item in
+            NavigationStack {
+                PokemonDetailsRouteView(pokemonName: item.name)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button("Close") {
+                                deepLinkCoordinator.dismissPresentedPokemon()
+                            }
+                        }
+                    }
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
     }
 }
 
 private struct MainTabsView: View {
     @StateObject private var searchContext = PokedexListingSearchContext()
+
+    @EnvironmentObject private var deepLinkCoordinator: DeepLinkCoordinator
     @State private var pokedexSearchText: String = ""
+
     let teamStore: TeamPokemonStore
 
     var body: some View {
         Group {
             if #available(iOS 26.0, *) {
-                tabsiOS26
+                tabsIOS26
             } else {
                 tabsLegacy
             }
         }
     }
 
-    // MARK: - iOS 26+
-
     @available(iOS 26.0, *)
-    private var tabsiOS26: some View {
+    private var tabsIOS26: some View {
         TabView {
+
             Tab("Pokédex", systemImage: "magnifyingglass") {
                 PokedexListingRouteView(
                     searchText: $pokedexSearchText,
@@ -78,10 +104,8 @@ private struct MainTabsView: View {
         }
     }
 
-    // MARK: - iOS < 26
-
     private var tabsLegacy: some View {
-        TabView {
+        TabView(selection: $deepLinkCoordinator.selectedTab) {
             PokedexListingRouteView(
                 searchText: $pokedexSearchText,
                 usesTabSearch: false,
@@ -91,12 +115,14 @@ private struct MainTabsView: View {
                 Image(systemName: "magnifyingglass")
                 Text("Pokédex")
             }
+            .tag(AppTab.pokedex)
 
             PokemonTeamRouteView()
                 .tabItem {
                     Image(systemName: "person.3.fill")
                     Text("My Team")
                 }
+                .tag(AppTab.team)
         }
     }
 }
