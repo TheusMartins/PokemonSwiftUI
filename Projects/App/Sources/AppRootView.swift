@@ -89,7 +89,7 @@ private struct MainTabsView: View {
                 )
             }
 
-            Tab("My Team", systemImage: "person.3.fill") {
+            Tab("My Team", image: "pokeballIcon") {
                 PokemonTeamRouteView()
             }
 
@@ -119,7 +119,7 @@ private struct MainTabsView: View {
 
             PokemonTeamRouteView()
                 .tabItem {
-                    Image(systemName: "person.3.fill")
+                    Image("pokeballIcon")
                     Text("My Team")
                 }
                 .tag(AppTab.team)
