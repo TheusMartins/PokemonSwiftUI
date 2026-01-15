@@ -8,10 +8,15 @@
 import SwiftUI
 
 public struct DSPillView: View {
+
+    // MARK: - Nested types
+
     public enum Size: Sendable {
         case small
         case medium
         case large
+
+        // MARK: - Tokens
 
         var horizontalPadding: CGFloat {
             switch self {
@@ -46,6 +51,8 @@ public struct DSPillView: View {
         }
     }
 
+    // MARK: - Private properties
+
     private let text: String
     private let size: Size
     private let background: Color
@@ -53,6 +60,8 @@ public struct DSPillView: View {
     private let border: Color?
     private let borderWidth: CGFloat
     private let isUppercased: Bool
+
+    // MARK: - Initialization
 
     public init(
         _ text: String,
@@ -72,30 +81,46 @@ public struct DSPillView: View {
         self.isUppercased = isUppercased
     }
 
+    // MARK: - View
+
     public var body: some View {
-        Text(isUppercased ? text.uppercased() : text)
+        Text(displayText)
             .font(size.font.weight(.semibold))
             .foregroundStyle(foreground)
             .padding(.horizontal, size.horizontalPadding)
             .padding(.vertical, size.verticalPadding)
-            .background(
-                Capsule()
-                    .fill(background)
-            )
-            .overlay(
-                Group {
-                    if let border {
-                        Capsule().stroke(border, lineWidth: borderWidth)
-                    }
-                }
-            )
+            .background(backgroundView)
+            .overlay(borderOverlay)
             .accessibilityLabel(text)
+    }
+
+    // MARK: - UI helpers
+
+    private var displayText: String {
+        isUppercased ? text.uppercased() : text
+    }
+
+    private var backgroundView: some View {
+        Capsule()
+            .fill(background)
+    }
+
+    private var borderOverlay: some View {
+        Group {
+            if let border {
+                Capsule()
+                    .stroke(border, lineWidth: borderWidth)
+            }
+        }
     }
 }
 
 // MARK: - DS convenience
 
 public extension DSPillView {
+
+    // MARK: - Initialization
+
     init(
         _ text: String,
         size: Size = .medium,

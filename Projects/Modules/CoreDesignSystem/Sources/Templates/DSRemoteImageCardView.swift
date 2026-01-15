@@ -10,9 +10,13 @@ import CoreRemoteImage
 
 public struct DSRemoteImageCardView: View {
 
+    // MARK: - Private properties
+
     private let title: String
     private let url: URL?
     private let height: CGFloat
+
+    // MARK: - Initialization
 
     public init(
         title: String,
@@ -24,6 +28,8 @@ public struct DSRemoteImageCardView: View {
         self.height = height
     }
 
+    // MARK: - View
+
     public var body: some View {
         VStack(alignment: .leading, spacing: DSSpacing.medium.value) {
             DSText(title, style: .body, color: .textSecondary)
@@ -32,18 +38,16 @@ public struct DSRemoteImageCardView: View {
                 RoundedRectangle(cornerRadius: DSRadius.large.value, style: .continuous)
                     .fill(DSColorToken.surface.color)
 
-                Group {
-                    if let url {
-                        RemoteImageView(
-                            url: url,
-                            placeholder: { Color.clear },
-                            loading: { DSLoadingView() },
-                            failure: { Image(systemName: "photo").imageScale(.large) }
-                        )
-                        .padding(DSSpacing.large.value)
-                    } else {
-                        DSText("No image", style: .body, color: .textSecondary)
-                    }
+                if let url {
+                    RemoteImageView(
+                        url: url,
+                        placeholder: { Color.clear },
+                        loading: { DSLoadingView() },
+                        failure: { Image(systemName: "photo").imageScale(.large) }
+                    )
+                    .padding(DSSpacing.large.value)
+                } else {
+                    DSText(String.noImage, style: .body, color: .textSecondary)
                 }
             }
             .frame(height: height)
@@ -51,6 +55,14 @@ public struct DSRemoteImageCardView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
+
+// MARK: - Constants
+
+private extension String {
+    static let noImage = "No image"
+}
+
+// MARK: - Preview
 
 #Preview("DSRemoteImageCardView – Light") {
     ZStack {

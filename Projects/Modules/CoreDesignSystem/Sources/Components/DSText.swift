@@ -8,9 +8,14 @@
 import SwiftUI
 
 public struct DSText: View {
+
+    // MARK: - Private properties
+
     private let text: String
     private let style: DSTextStyle
     private let color: DSColorToken
+
+    // MARK: - Initialization
 
     public init(
         _ text: String,
@@ -22,6 +27,8 @@ public struct DSText: View {
         self.color = color
     }
 
+    // MARK: - View
+
     public var body: some View {
         Text(text)
             .font(style.typography.font)
@@ -29,6 +36,8 @@ public struct DSText: View {
             .lineSpacing(style.typography.lineSpacing)
     }
 }
+
+// MARK: - Preview
 
 #Preview("DSText – Light") {
     ScrollView {

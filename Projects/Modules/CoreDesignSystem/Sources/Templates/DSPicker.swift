@@ -8,6 +8,9 @@
 import SwiftUI
 
 public struct DSPicker<Option: Hashable & Sendable>: View {
+
+    // MARK: - Private properties
+
     private let title: String?
     private let options: [Option]
     private let label: @Sendable (Option) -> String
@@ -15,6 +18,8 @@ public struct DSPicker<Option: Hashable & Sendable>: View {
     private let onSelectionChanged: (@MainActor @Sendable (Option) -> Void)?
 
     @State private var isPresented = false
+
+    // MARK: - Initialization
 
     public init(
         title: String? = nil,
@@ -30,6 +35,8 @@ public struct DSPicker<Option: Hashable & Sendable>: View {
         self.onSelectionChanged = onSelectionChanged
     }
 
+    // MARK: - View
+
     public var body: some View {
         VStack(alignment: .leading, spacing: DSSpacing.small.value) {
             if let title {
@@ -44,18 +51,16 @@ public struct DSPicker<Option: Hashable & Sendable>: View {
                         .rotationEffect(.degrees(isPresented ? 180 : 0))
                         .animation(.easeInOut(duration: 0.18), value: isPresented)
                         .foregroundStyle(DSColorToken.textSecondary.color)
-                    
+
                     DSText(label(selection), style: .title, color: .textPrimary)
 
-                    
                     Spacer()
-
                 }
                 .padding(.vertical, DSSpacing.medium.value)
                 .padding(.horizontal, DSSpacing.large.value)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(title ?? "Picker")
+            .accessibilityLabel(title ?? String.pickerAccessibilityLabel)
             .accessibilityValue(label(selection))
         }
         .sheet(isPresented: $isPresented) {
@@ -80,12 +85,17 @@ public struct DSPicker<Option: Hashable & Sendable>: View {
 }
 
 private struct OptionSheet<Option: Hashable & Sendable>: View {
+
+    // MARK: - Properties
+
     let title: String?
     let options: [Option]
     @Binding var selection: Option
     let label: @Sendable (Option) -> String
     let onSelectionChanged: (@MainActor @Sendable (Option) -> Void)?
     let dismiss: () -> Void
+
+    // MARK: - View
 
     var body: some View {
         VStack(spacing: DSSpacing.large.value) {
@@ -124,6 +134,14 @@ private struct OptionSheet<Option: Hashable & Sendable>: View {
     }
 }
 
+// MARK: - Constants
+
+private extension String {
+    static let pickerAccessibilityLabel = "Picker"
+}
+
+// MARK: - Preview
+
 private enum Generation: Int, CaseIterable, Hashable, Sendable {
     case gen1 = 1, gen2, gen3, gen4, gen5, gen6, gen7, gen8, gen9
 
@@ -143,7 +161,7 @@ private struct DSPickerPreviewContent: View {
                 selection: $generation,
                 label: { @Sendable in $0.title }
             )
-            
+
             Spacer()
 
             DSText(

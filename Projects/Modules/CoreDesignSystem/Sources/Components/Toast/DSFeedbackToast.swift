@@ -9,12 +9,16 @@ import SwiftUI
 
 public struct DSFeedbackToast: View {
 
+    // MARK: - Private properties
+
     private let title: String
     private let message: String?
     private let style: DSFeedbackStyle
     private let onDismiss: @Sendable () -> Void
 
     @State private var dragOffsetY: CGFloat = .zero
+
+    // MARK: - Initialization
 
     public init(
         title: String,
@@ -28,36 +32,50 @@ public struct DSFeedbackToast: View {
         self.onDismiss = onDismiss
     }
 
+    // MARK: - View
+
     public var body: some View {
         DSFeedbackView(title: title, message: message, style: style)
-            .offset(y: max(dragOffsetY, -60)) // allow pulling up a bit
+            .offset(y: max(dragOffsetY, Constants.maxUpwardOffset))
             .gesture(dragGesture)
-            .transition(
-                .asymmetric(
-                    insertion: .move(edge: .top).combined(with: .opacity),
-                    removal: .move(edge: .top).combined(with: .opacity)
-                )
-            )
+            .transition(toastTransition)
             .animation(.snappy, value: dragOffsetY)
     }
 
+    // MARK: - Private computed properties
+
+    private var toastTransition: AnyTransition {
+        .asymmetric(
+            insertion: .move(edge: .top).combined(with: .opacity),
+            removal: .move(edge: .top).combined(with: .opacity)
+        )
+    }
+
     private var dragGesture: some Gesture {
-        DragGesture(minimumDistance: 8, coordinateSpace: .local)
+        DragGesture(minimumDistance: Constants.minimumDragDistance, coordinateSpace: .local)
             .onChanged { value in
-                // only track upward drag (swipe up)
-                if value.translation.height < 0 {
+                if value.translation.height < .zero {
                     dragOffsetY = value.translation.height
                 } else {
-                    dragOffsetY = 0
+                    dragOffsetY = .zero
                 }
             }
             .onEnded { value in
-                let shouldDismiss = value.translation.height < -40
-                if shouldDismiss {
+                if value.translation.height < Constants.dismissThreshold {
                     onDismiss()
                 }
-                dragOffsetY = 0
+                dragOffsetY = .zero
             }
+    }
+}
+
+// MARK: - Constants
+
+private extension DSFeedbackToast {
+    enum Constants {
+        static let minimumDragDistance: CGFloat = 8
+        static let dismissThreshold: CGFloat = -40
+        static let maxUpwardOffset: CGFloat = -60
     }
 }
 
@@ -70,10 +88,10 @@ private struct DSFeedbackToastPreviewScreen: View {
     var body: some View {
         ZStack(alignment: .top) {
             DSColorToken.background.color.ignoresSafeArea()
-            
+
             VStack(spacing: DSSpacing.large.value) {
                 Spacer()
-                
+
                 DSButton(title: isPresented ? "Hide" : "Show") {
                     withAnimation(.snappy) { isPresented.toggle() }
                 }

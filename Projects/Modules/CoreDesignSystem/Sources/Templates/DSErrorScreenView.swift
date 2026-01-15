@@ -9,9 +9,13 @@ import SwiftUI
 
 public struct DSErrorScreenView: View {
 
+    // MARK: - Private properties
+
     private let title: String
     private let buttonTitle: String
     private let onRetry: () -> Void
+
+    // MARK: - Initialization
 
     public init(
         title: String = "Something went wrong",
@@ -23,17 +27,19 @@ public struct DSErrorScreenView: View {
         self.onRetry = onRetry
     }
 
+    // MARK: - View
+
     public var body: some View {
         VStack(spacing: DSSpacing.large.value) {
 
-            Image(.imageName, bundle: .module)
+            Image(.errorImageName, bundle: .module)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 180, height: 180)
 
             DSText(title, style: .title, color: .textPrimary)
                 .multilineTextAlignment(.center)
-            
+
             Spacer()
 
             DSButton(
@@ -48,11 +54,13 @@ public struct DSErrorScreenView: View {
     }
 }
 
+// MARK: - Constants
+
 private extension String {
-    static var imageName: String {
-        return "suprised_pikachu"
-    }
+    static let errorImageName = "suprised_pikachu"
 }
+
+// MARK: - Preview
 
 #Preview("Light") {
     DSErrorScreenView(onRetry: {})

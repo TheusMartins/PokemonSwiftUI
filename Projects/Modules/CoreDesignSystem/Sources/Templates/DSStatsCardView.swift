@@ -9,15 +9,19 @@ import SwiftUI
 
 public struct DSStatsCardView: View {
 
-    private let title: String
-    private let rows: [Row]
+    // MARK: - Nested types
 
     public struct Row: Identifiable, Equatable {
+
+        // MARK: - Public properties
+
         public let id: String
         public let title: String
         public let value: Int
         public let progress: CGFloat
         public let barToken: DSColorToken
+
+        // MARK: - Initialization
 
         public init(
             id: String,
@@ -34,6 +38,13 @@ public struct DSStatsCardView: View {
         }
     }
 
+    // MARK: - Private properties
+
+    private let title: String
+    private let rows: [Row]
+
+    // MARK: - Initialization
+
     public init(
         title: String,
         rows: [Row]
@@ -42,19 +53,32 @@ public struct DSStatsCardView: View {
         self.rows = rows
     }
 
+    // MARK: - View
+
     public var body: some View {
         VStack(alignment: .leading, spacing: DSSpacing.medium.value) {
             DSText(title, style: .title)
 
-            VStack {
-                ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
-                    DSStatProgressRowView(title: row.title, value: row.value, progress: row.progress, barToken: row.barToken)
-                }
-            }
-            .padding(DSSpacing.large.value)
-            .background(DSColorToken.surface.color)
-            .clipShape(RoundedRectangle(cornerRadius: DSRadius.large.value, style: .continuous))
+            rowsList
         }
+    }
+
+    // MARK: - Private views
+
+    private var rowsList: some View {
+        VStack(spacing: 0) {
+            ForEach(rows) { row in
+                DSStatProgressRowView(
+                    title: row.title,
+                    value: row.value,
+                    progress: row.progress,
+                    barToken: row.barToken
+                )
+            }
+        }
+        .padding(DSSpacing.large.value)
+        .background(DSColorToken.surface.color)
+        .clipShape(RoundedRectangle(cornerRadius: DSRadius.large.value, style: .continuous))
     }
 }
 

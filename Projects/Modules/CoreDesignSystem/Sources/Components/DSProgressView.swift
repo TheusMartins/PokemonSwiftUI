@@ -8,8 +8,15 @@
 import SwiftUI
 
 public struct DSProgressView: View {
+
+    // MARK: - Nested types
+
     public enum Size: Sendable {
-        case small, medium, large
+        case small
+        case medium
+        case large
+
+        // MARK: - Tokens
 
         var height: CGFloat {
             switch self {
@@ -20,12 +27,16 @@ public struct DSProgressView: View {
         }
     }
 
+    // MARK: - Private properties
+
     private let progress: CGFloat
     private let size: Size
     private let trackColor: Color
     private let fillColor: Color
 
     @State private var displayProgress: CGFloat = .zero
+
+    // MARK: - Initialization
 
     public init(
         progress: CGFloat,
@@ -38,6 +49,8 @@ public struct DSProgressView: View {
         self.trackColor = trackColor
         self.fillColor = fillColor
     }
+
+    // MARK: - View
 
     public var body: some View {
         GeometryReader { proxy in
@@ -52,19 +65,27 @@ public struct DSProgressView: View {
                     .fill(fillColor)
                     .frame(width: width * displayProgress, height: size.height)
             }
-            .onAppear {
-                displayProgress = .zero
-                withAnimation(.easeOut(duration: 0.7)) {
-                    displayProgress = progress
-                }
-            }
+            .onAppear(perform: animateToInitialProgress)
             .onChange(of: progress) { _, newValue in
-                withAnimation(.easeOut(duration: 0.35)) {
-                    displayProgress = min(max(newValue, 0), 1)
-                }
+                animateToProgress(newValue)
             }
         }
         .frame(height: size.height)
+    }
+
+    // MARK: - Private methods
+
+    private func animateToInitialProgress() {
+        displayProgress = .zero
+        withAnimation(.easeOut(duration: 0.7)) {
+            displayProgress = progress
+        }
+    }
+
+    private func animateToProgress(_ value: CGFloat) {
+        withAnimation(.easeOut(duration: 0.35)) {
+            displayProgress = min(max(value, 0), 1)
+        }
     }
 }
 

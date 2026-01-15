@@ -16,9 +16,13 @@ public enum DSFeedbackStyle: Sendable {
 
 public struct DSFeedbackView: View {
 
+    // MARK: - Private properties
+
     private let title: String
     private let message: String?
     private let style: DSFeedbackStyle
+
+    // MARK: - Initialization
 
     public init(
         title: String,
@@ -30,9 +34,10 @@ public struct DSFeedbackView: View {
         self.style = style
     }
 
+    // MARK: - View
+
     public var body: some View {
         HStack(alignment: .top, spacing: DSSpacing.medium.value) {
-
             Image(systemName: iconName)
                 .imageScale(.medium)
                 .foregroundStyle(iconColor)
@@ -45,7 +50,7 @@ public struct DSFeedbackView: View {
                 }
             }
 
-            Spacer(minLength: 0)
+            Spacer(minLength: .zero)
         }
         .padding(.vertical, DSSpacing.medium.value)
         .padding(.horizontal, DSSpacing.large.value)
@@ -65,17 +70,17 @@ public struct DSFeedbackView: View {
 
     private var borderOverlay: some View {
         RoundedRectangle(cornerRadius: DSRadius.large.value, style: .continuous)
-            .stroke(borderColor, lineWidth: 1)
+            .stroke(borderColor, lineWidth: Constants.borderLineWidth)
     }
 
     private var backgroundColor: Color {
         switch style {
         case .success:
-            return DSColorToken.pokemonGreen.color.opacity(0.18)
+            return DSColorToken.pokemonGreen.color.opacity(Constants.backgroundOpacity)
         case .warning:
-            return DSColorToken.pokemonYellow.color.opacity(0.18)
+            return DSColorToken.pokemonYellow.color.opacity(Constants.backgroundOpacity)
         case .error:
-            return DSColorToken.danger.color.opacity(0.18)
+            return DSColorToken.danger.color.opacity(Constants.backgroundOpacity)
         case .info:
             return DSColorToken.surface.color
         }
@@ -84,13 +89,13 @@ public struct DSFeedbackView: View {
     private var borderColor: Color {
         switch style {
         case .success:
-            return DSColorToken.pokemonGreen.color.opacity(0.35)
+            return DSColorToken.pokemonGreen.color.opacity(Constants.borderOpacity)
         case .warning:
-            return DSColorToken.pokemonYellow.color.opacity(0.35)
+            return DSColorToken.pokemonYellow.color.opacity(Constants.borderOpacity)
         case .error:
-            return DSColorToken.danger.color.opacity(0.35)
+            return DSColorToken.danger.color.opacity(Constants.borderOpacity)
         case .info:
-            return DSColorToken.border.color.opacity(0.6)
+            return DSColorToken.border.color.opacity(Constants.infoBorderOpacity)
         }
     }
 
@@ -107,13 +112,19 @@ public struct DSFeedbackView: View {
         }
     }
 
-    private var titleColor: DSColorToken {
-        .textPrimary
+    private var titleColor: DSColorToken { .textPrimary }
+    private var messageColor: DSColorToken { .textSecondary }
+
+    // MARK: - Accessibility
+
+    private var accessibilityText: String {
+        if let message, !message.isEmpty {
+            return "\(title). \(message)"
+        }
+        return title
     }
 
-    private var messageColor: DSColorToken {
-        .textSecondary
-    }
+    // MARK: - Helpers
 
     private var iconName: String {
         switch style {
@@ -123,12 +134,16 @@ public struct DSFeedbackView: View {
         case .info: return "info.circle.fill"
         }
     }
+}
 
-    private var accessibilityText: String {
-        if let message, !message.isEmpty {
-            return "\(title). \(message)"
-        }
-        return title
+// MARK: - Constants
+
+private extension DSFeedbackView {
+    enum Constants {
+        static let borderLineWidth: CGFloat = 1
+        static let backgroundOpacity: CGFloat = 0.18
+        static let borderOpacity: CGFloat = 0.35
+        static let infoBorderOpacity: CGFloat = 0.6
     }
 }
 

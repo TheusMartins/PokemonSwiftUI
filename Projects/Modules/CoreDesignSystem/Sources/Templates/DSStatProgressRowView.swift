@@ -9,10 +9,14 @@ import SwiftUI
 
 public struct DSStatProgressRowView: View {
 
+    // MARK: - Private properties
+
     private let title: String
     private let valueText: String
     private let progress: CGFloat
     private let barColor: Color
+
+    // MARK: - Initialization
 
     public init(
         title: String,
@@ -25,6 +29,8 @@ public struct DSStatProgressRowView: View {
         self.progress = progress
         self.barColor = barColor
     }
+
+    // MARK: - View
 
     public var body: some View {
         VStack(alignment: .leading, spacing: DSSpacing.small.value) {
@@ -39,6 +45,8 @@ public struct DSStatProgressRowView: View {
         }
         .padding(.vertical, DSSpacing.small.value)
     }
+
+    // MARK: - Private views
 
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {

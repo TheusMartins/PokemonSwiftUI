@@ -13,11 +13,16 @@ public enum DSButtonStyle: Sendable {
 }
 
 public struct DSButton: View {
+
+    // MARK: - Private properties
+
     private let title: String
     private let style: DSButtonStyle
     private let isLoading: Bool
     private let isEnabled: Bool
     private let action: @Sendable () -> Void
+
+    // MARK: - Initialization
 
     public init(
         title: String,
@@ -33,10 +38,10 @@ public struct DSButton: View {
         self.action = action
     }
 
+    // MARK: - View
+
     public var body: some View {
-        Button {
-            action()
-        } label: {
+        Button(action: action) {
             HStack(spacing: DSSpacing.small.value) {
                 if isLoading {
                     DSLoadingView()
@@ -48,33 +53,72 @@ public struct DSButton: View {
             .padding(.horizontal, DSSpacing.large.value)
         }
         .buttonStyle(.plain)
-        .background(backgroundColor)
+        .background(background)
         .overlay(borderOverlay)
         .clipShape(RoundedRectangle(cornerRadius: DSRadius.medium.value))
-        .opacity(isEnabled ? 1 : 0.5)
+        .opacity(isEnabled ? 1 : Constants.disabledOpacity)
         .disabled(!isEnabled || isLoading)
     }
 
-    private var backgroundColor: some View {
+    // MARK: - Tokens
+
+    private var background: some View {
         RoundedRectangle(cornerRadius: DSRadius.medium.value)
-            .fill(
-                style == .primary
-                ? DSColorToken.brandPrimary.color
-                : DSColorToken.brandSecondary.color
-            )
+            .fill(backgroundColor)
     }
 
     private var borderOverlay: some View {
         RoundedRectangle(cornerRadius: DSRadius.medium.value)
-            .stroke(DSColorToken.border.color, lineWidth: style == .secondary ? 1 : 0)
+            .stroke(borderColor, lineWidth: borderLineWidth)
+    }
+
+    private var backgroundColor: Color {
+        switch style {
+        case .primary:
+            return DSColorToken.brandPrimary.color
+        case .secondary:
+            return DSColorToken.brandSecondary.color
+        }
+    }
+
+    private var borderColor: Color {
+        switch style {
+        case .primary:
+            return .clear
+        case .secondary:
+            return DSColorToken.border.color
+        }
+    }
+
+    private var borderLineWidth: CGFloat {
+        switch style {
+        case .primary:
+            return 0
+        case .secondary:
+            return Constants.secondaryBorderLineWidth
+        }
     }
 
     private var titleColorToken: DSColorToken {
-        style == .primary
-        ? .brandPrimaryOn
-        : .brandSecondaryOn
+        switch style {
+        case .primary:
+            return .brandPrimaryOn
+        case .secondary:
+            return .brandSecondaryOn
+        }
     }
 }
+
+// MARK: - Constants
+
+private extension DSButton {
+    enum Constants {
+        static let disabledOpacity: CGFloat = 0.5
+        static let secondaryBorderLineWidth: CGFloat = 1
+    }
+}
+
+// MARK: - Preview
 
 private struct DSButtonPreviewScreen: View {
     var body: some View {
