@@ -10,8 +10,6 @@ import XCTest
 
 final class FileKeyValueStoreTests: XCTestCase {
 
-    // MARK: - Tests
-
     func test_init_createsDirectoryIfNeeded() async throws {
         // Given
         let persistor = FilePersistorSpy()
@@ -95,7 +93,7 @@ final class FileKeyValueStoreTests: XCTestCase {
     }
 }
 
-// MARK: - Spy (same file)
+// MARK: - Spy
 
 private actor FilePersistorSpy: FilePersisting {
 

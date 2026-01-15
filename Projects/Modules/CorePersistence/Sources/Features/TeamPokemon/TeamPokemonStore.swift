@@ -7,24 +7,44 @@
 
 import Foundation
 
+// MARK: - Errors
+
 public enum TeamPokemonStoreError: Error, Equatable, Sendable {
     case teamIsFull(max: Int)
     case alreadyExists
 }
 
+// MARK: - Protocol
+
 public protocol TeamPokemonStore: Sendable {
+
+    /// Returns the current team stored on disk.
     func fetchTeam() async throws -> [TeamPokemon]
+
+    /// Persists a new team member.
+    /// - Throws: `TeamPokemonStoreError.alreadyExists` if the Pokémon is already in the team.
+    /// - Throws: `TeamPokemonStoreError.teamIsFull` if the team reached `maxTeamSize`.
     func save(_ pokemon: TeamPokemon) async throws
+
+    /// Removes a member by id.
     func delete(memberId: Int) async throws
+
+    /// Checks whether a member exists in the current team.
     func contains(memberId: Int) async throws -> Bool
 }
 
+// MARK: - Implementation
+
 public final class TeamPokemonStoreImplementation: TeamPokemonStore {
+
+    // MARK: - Private Properties
 
     private let keyValueStore: KeyValueStoring
     private let coder: JSONCoding
     private let key: PersistenceKey
     private let maxTeamSize: Int
+
+    // MARK: - Initialization
 
     private init(
         keyValueStore: KeyValueStoring,
@@ -38,7 +58,9 @@ public final class TeamPokemonStoreImplementation: TeamPokemonStore {
         self.maxTeamSize = maxTeamSize
     }
 
-    // ✅ Default factory for the app
+    // MARK: - Factories
+
+    /// Default factory used by the app.
     public static func makeDefault(
         directory: PersistenceDirectory = .caches,
         maxTeamSize: Int = 6
@@ -52,7 +74,8 @@ public final class TeamPokemonStoreImplementation: TeamPokemonStore {
             maxTeamSize: maxTeamSize
         )
     }
-    
+
+    /// Factory used by tests and feature modules.
     static func make(
         keyValueStore: KeyValueStoring,
         coder: JSONCoding = DefaultJSONCoder(),
@@ -66,6 +89,8 @@ public final class TeamPokemonStoreImplementation: TeamPokemonStore {
             maxTeamSize: maxTeamSize
         )
     }
+
+    // MARK: - Public Methods
 
     public func fetchTeam() async throws -> [TeamPokemon] {
         guard let data = try await keyValueStore.get(for: key) else { return [] }

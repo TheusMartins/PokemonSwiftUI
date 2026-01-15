@@ -10,8 +10,6 @@ import XCTest
 
 final class DefaultJSONStoreTests: XCTestCase {
 
-    // MARK: - Tests
-
     func test_set_givenEncodable_whenCalled_thenStoresEncodedData() async throws {
         // Given
         let kvSpy = KeyValueStoreSpy()

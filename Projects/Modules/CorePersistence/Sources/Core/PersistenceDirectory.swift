@@ -9,11 +9,18 @@
 import Foundation
 
 public enum PersistenceDirectory: Sendable {
+
+    // MARK: - Cases
+
     case caches
     case documents
 
-    // Default choice for the app.
+    // MARK: - Defaults
+
+    /// Default directory choice for the app.
     public static let `default`: PersistenceDirectory = .caches
+
+    // MARK: - Public API
 
     public func url(using fileManager: FileManager = .default) throws -> URL {
         let searchDirectory: FileManager.SearchPathDirectory
@@ -25,10 +32,16 @@ public enum PersistenceDirectory: Sendable {
             searchDirectory = .documentDirectory
         }
 
-        guard let baseURL = fileManager.urls(for: searchDirectory, in: .userDomainMask).first else {
+        guard let baseURL = fileManager.urls(
+            for: searchDirectory,
+            in: .userDomainMask
+        ).first else {
             throw PersistenceError.unableToResolveDirectory
         }
 
-        return baseURL.appendingPathComponent("CorePersistence", isDirectory: true)
+        return baseURL.appendingPathComponent(
+            "CorePersistence",
+            isDirectory: true
+        )
     }
 }
