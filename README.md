@@ -174,12 +174,10 @@ Snapshot testing was intentionally skipped to keep the scope focused on logic an
 ## 🛣 Roadmap and Possible Improvements
 
 Planned or intentionally out-of-scope items:
-- Integration tests
 - UI automation using Maestro
 - Snapshot tests
 - CI pipeline using Fastlane
 - Certificate management and TestFlight deployment
-- Analytics hooks
 - More advanced server-driven navigation experiments
 
 These tools and topics are part of my regular background but were not the focus of this project.
