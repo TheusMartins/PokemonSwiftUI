@@ -5,9 +5,12 @@ Pokédex Showcase is a modular iOS application built with SwiftUI and Swift Conc
 This project was intentionally designed as a showcase and learning playground. The goal is not visual perfection, but clarity of structure, reasoning, and trade-offs commonly faced in production iOS applications.
 
 
-## 🎮 Demo
+## 🎮 Demo & Evidence
 
-A full demo video, feature walkthrough, and edge cases are documented in the Pull Request description for this repository.
+A full demo video, feature walkthrough, edge cases, and deep link evidence are documented in the Pull Request below (could not record long videos due file sixe to add in the PR):
+
+🔗 **Pull Request (source of truth)**  
+https://github.com/TheusMartins/PokemonSwiftUI/pull/1
 
 The PR includes:
 - Pokémon listing by generation
@@ -15,7 +18,9 @@ The PR includes:
 - Add and remove Pokémon from a persistent team
 - Error and loading states
 - Light and Dark mode
-- Deep linking support
+- Deep linking support (listing, generation selection, details)
+
+This approach keeps the README concise while allowing the PR to act as a living, reviewable artifact.
 
 
 ## 🧱 Architecture Overview
