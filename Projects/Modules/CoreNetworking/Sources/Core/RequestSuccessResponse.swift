@@ -8,10 +8,18 @@
 import Foundation
 
 public struct RequestSuccessResponse {
+
+    // MARK: - Properties
+
     public let data: Data
     public let response: URLResponse
 
-    public init(data: Data, response: URLResponse) {
+    // MARK: - Init
+
+    public init(
+        data: Data,
+        response: URLResponse
+    ) {
         self.data = data
         self.response = response
     }

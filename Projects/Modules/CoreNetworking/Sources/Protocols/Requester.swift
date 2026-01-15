@@ -7,6 +7,15 @@
 
 import Foundation
 
-public protocol Requester {
-    func request(basedOn infos: RequestInfos) async throws -> RequestSuccessResponse
+// MARK: - Requester
+
+/// Abstraction responsible for executing network requests
+/// based on a `RequestInfos` definition.
+public protocol Requester: Sendable {
+
+    // MARK: - Request
+
+    func request(
+        basedOn infos: RequestInfos
+    ) async throws -> RequestSuccessResponse
 }

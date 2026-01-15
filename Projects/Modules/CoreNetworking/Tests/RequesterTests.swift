@@ -157,7 +157,6 @@ final class RequesterTests: XCTestCase {
         var endpoint: String = "valid"
         var method: HTTPMethod = .get
         var parameters: [String : Any]? = nil
-        // Uses default baseURL from RequestInfos extension
     }
 }
 

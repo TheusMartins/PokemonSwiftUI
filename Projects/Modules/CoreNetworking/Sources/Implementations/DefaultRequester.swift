@@ -7,16 +7,28 @@
 
 import Foundation
 
+// MARK: - DefaultRequester
+
+/// Default network requester used by the app.
+/// Builds a `URLRequest` from `RequestInfos` and performs it using `URLSession`.
 public actor DefaultRequester: Requester {
+
+    // MARK: - Properties
+
     private let session: URLSession
     private var requestCount: Int = 0
+
+    // MARK: - Initialization
 
     public init(session: URLSession = .shared) {
         self.session = session
     }
 
+    // MARK: - Public API
+
     public func request(basedOn infos: RequestInfos) async throws -> RequestSuccessResponse {
         requestCount += 1
+
         guard let request = buildURLRequest(basedOn: infos) else {
             throw RequestError.invalidURL
         }
@@ -39,30 +51,41 @@ public actor DefaultRequester: Requester {
             throw RequestError.transportError
         }
     }
-    
+
     public func totalRequests() -> Int {
-        return requestCount
+        requestCount
     }
 
     // MARK: - Helpers
 
-
     private func buildURLRequest(basedOn infos: RequestInfos) -> URLRequest? {
-        // 1) Resolve the base URL + endpoint into a valid absolute URL
+        guard let url = resolveURL(from: infos) else { return nil }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = infos.method.rawValue
+
+        if let headers = infos.headers, !headers.isEmpty {
+            headers.forEach { key, value in
+                request.setValue(value, forHTTPHeaderField: key)
+            }
+        }
+
+        return request
+    }
+
+    private func resolveURL(from infos: RequestInfos) -> URL? {
         let components: URLComponents?
 
         if let baseURL = infos.baseURL {
-            // Normalize endpoint to avoid double slashes or missing slash
             let trimmedEndpoint = infos.endpoint.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
             guard !trimmedEndpoint.isEmpty else { return nil }
 
             let absolute = baseURL.appendingPathComponent(trimmedEndpoint).absoluteString
             components = URLComponents(string: absolute)
         } else {
-            // Without a baseURL, we only accept an absolute endpoint (e.g. "https://...")
             components = URLComponents(string: infos.endpoint)
 
-            // Reject relative URLs like "invalid" or "/path"
+            // Reject relative URLs like "invalid" or "/path".
             guard
                 let scheme = components?.scheme, !scheme.isEmpty,
                 let host = components?.host, !host.isEmpty
@@ -73,20 +96,12 @@ public actor DefaultRequester: Requester {
 
         guard var urlComponents = components else { return nil }
 
-        // 2) Add query items
         if let parameters = infos.parameters, !parameters.isEmpty {
             urlComponents.queryItems = (urlComponents.queryItems ?? []) + parameters.map {
-                URLQueryItem(name: $0.key, value: "\($0.value)")
+                URLQueryItem(name: $0.key, value: $0.value)
             }
         }
 
-        // 3) Final URL must be absolute
-        guard let finalURL = urlComponents.url, finalURL.scheme != nil else {
-            return nil
-        }
-
-        var request = URLRequest(url: finalURL)
-        request.httpMethod = infos.method.rawValue
-        return request
+        return urlComponents.url
     }
 }
