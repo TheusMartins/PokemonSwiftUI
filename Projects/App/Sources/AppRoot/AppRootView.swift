@@ -48,7 +48,7 @@ struct AppRootView: View {
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) {
                             Button("Close") {
-                                deepLinkCoordinator.dismissPresentedPokemon()
+                                deepLinkCoordinator.dismissPresentedPokemon() 
                             }
                         }
                     }
