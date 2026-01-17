@@ -30,7 +30,7 @@ final class DefaultJSONStoreTests: XCTestCase {
         XCTAssertEqual(calls.first?.data, Data("encoded".utf8))
     }
 
-    func test_set_givenCoderThrows_whenCalled_thenThrowsAndDoesNotCallStore() async {
+    func test_set_givenCoderThrows_whenCalled_thenThrowsAndDoesNotCallStore() async { 
         // Given
         let kvSpy = KeyValueStoreSpy()
         let coder = JSONCoderSpy()
